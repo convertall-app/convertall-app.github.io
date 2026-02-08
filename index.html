@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" data-lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConvertAll — Convertisseur de Fichiers Gratuit</title>
+  <meta name="description" content="Convertisseur de fichiers gratuit en ligne : images, PDF, vidéo, audio, QR Code. 100% privé, tout reste sur votre appareil.">
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #f0f2f5;
+      --bg-secondary: rgba(255,255,255,0.7);
+      --bg-card: rgba(255,255,255,0.6);
+      --bg-drop: rgba(255,255,255,0.4);
+      --text-primary: #1a1a2e;
+      --text-secondary: #555;
+      --text-muted: #888;
+      --border: rgba(0,0,0,0.1);
+      --shadow: rgba(0,0,0,0.1);
+      --gradient-1: #667eea;
+      --gradient-2: #764ba2;
+      --accent: #6366f1;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --glass-blur: 20px;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f0c29;
+      --bg-secondary: rgba(30,27,75,0.7);
+      --bg-card: rgba(30,27,75,0.5);
+      --bg-drop: rgba(40,37,85,0.5);
+      --text-primary: #e2e8f0;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      --border: rgba(255,255,255,0.1);
+      --shadow: rgba(0,0,0,0.3);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background 0.4s, color 0.4s;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 40%, rgba(102,126,234,0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(118,75,162,0.15) 0%, transparent 50%);
+      z-index: 0;
+      animation: bgShift 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgShift { 0%{transform:translate(0,0)} 100%{transform:translate(3%,3%)} }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+    @keyframes toastIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes toastOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(40px)} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    .app { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:20px; min-height:100vh; display:flex; flex-direction:column; }
+
+    /* HEADER */
+    header {
+      display:flex; align-items:center; justify-content:space-between; padding:16px 24px;
+      background:var(--bg-card); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+      border:1px solid var(--border); border-radius:20px; margin-bottom:16px; transition:background 0.4s;
+    }
+    .logo { display:flex; align-items:center; gap:12px; }
+    .logo-icon { width:42px; height:42px; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; font-weight:bold; }
+    .logo h1 { font-size:1.4rem; font-weight:700; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .logo small { display:block; font-size:.68rem; color:var(--text-muted); font-weight:400; -webkit-text-fill-color:var(--text-muted); }
+    .header-actions { display:flex; gap:8px; align-items:center; }
+    .header-btn { width:40px; height:40px; border:1px solid var(--border); border-radius:10px; background:var(--bg-drop); color:var(--text-primary); cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all .3s; }
+    .header-btn:hover { transform:scale(1.1); border-color:var(--accent); }
+    .lang-btn { font-size:13px; font-weight:700; width:auto; padding:0 12px; }
+
+    /* TABS */
+    .tabs { display:flex; gap:6px; padding:5px; background:var(--bg-card); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border:1px solid var(--border); border-radius:16px; margin-bottom:16px; transition:background 0.4s; flex-wrap:wrap; }
+    .tab { flex:1; padding:10px 8px; border:none; background:transparent; color:var(--text-secondary); font-size:.82rem; font-weight:600; cursor:pointer; border-radius:12px; transition:all .3s; display:flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; min-width:0; }
+    .tab:hover { color:var(--text-primary); background:var(--bg-drop); }
+    .tab.active { background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:#fff; box-shadow:0 4px 15px rgba(102,126,234,0.4); }
+
+    /* SUB TOOLS */
+    .sub-tools { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+    .sub-tool { padding:8px 14px; border:1px solid var(--border); background:var(--bg-drop); color:var(--text-secondary); font-size:.8rem; font-weight:600; cursor:pointer; border-radius:10px; transition:all .3s; }
+    .sub-tool:hover { border-color:var(--accent); color:var(--text-primary); }
+    .sub-tool.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+    /* MAIN */
+    main { background:var(--bg-card); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border:1px solid var(--border); border-radius:20px; padding:24px; flex:1; transition:background 0.4s; }
+
+    /* AD SPACE */
+    .ad-space { margin:16px 0; padding:20px; border:2px dashed var(--border); border-radius:14px; text-align:center; color:var(--text-muted); font-size:.8rem; background:var(--bg-drop); min-height:90px; display:flex; align-items:center; justify-content:center; }
+
+    /* DROP ZONE */
+    .drop-zone { border:2px dashed var(--border); border-radius:16px; padding:40px 20px; text-align:center; cursor:pointer; transition:all .3s; background:var(--bg-drop); position:relative; overflow:hidden; }
+    .drop-zone::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(102,126,234,0.1),rgba(118,75,162,0.1)); opacity:0; transition:opacity .3s; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--accent); transform:scale(1.01); }
+    .drop-zone:hover::before, .drop-zone.drag-over::before { opacity:1; }
+    .drop-zone.drag-over { box-shadow:0 0 30px rgba(102,126,234,0.3); }
+    .drop-icon { font-size:2.5rem; margin-bottom:10px; animation:float 3s ease-in-out infinite; }
+    .drop-zone h3 { font-size:1rem; margin-bottom:4px; }
+    .drop-zone p { color:var(--text-muted); font-size:.82rem; }
+    .drop-zone .formats-hint { margin-top:10px; font-size:.72rem; opacity:.7; color:var(--text-muted); }
+
+    /* FILES */
+    .files-list { margin-top:16px; display:flex; flex-direction:column; gap:8px; }
+    .file-card { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg-drop); border:1px solid var(--border); border-radius:12px; animation:slideIn .3s; transition:all .3s; }
+    .file-card:hover { border-color:var(--accent); }
+    .file-thumb { width:44px; height:44px; border-radius:10px; object-fit:cover; background:var(--bg-secondary); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; overflow:hidden; }
+    .file-thumb img { width:100%; height:100%; object-fit:cover; }
+    .file-info { flex:1; min-width:0; }
+    .file-name { font-weight:600; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .file-size { font-size:.75rem; color:var(--text-muted); margin-top:2px; }
+    .file-remove { width:30px; height:30px; border:none; background:rgba(239,68,68,0.1); color:var(--danger); border-radius:8px; cursor:pointer; font-size:.9rem; display:flex; align-items:center; justify-content:center; transition:all .2s; flex-shrink:0; }
+    .file-remove:hover { background:var(--danger); color:#fff; transform:scale(1.1); }
+
+    /* OPTIONS */
+    .options-panel { margin-top:16px; padding:18px; background:var(--bg-drop); border:1px solid var(--border); border-radius:14px; animation:slideIn .3s; }
+    .options-row { display:flex; flex-wrap:wrap; gap:14px; align-items:end; }
+    .option-group { flex:1; min-width:160px; }
+    .option-group label { display:block; font-size:.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+    .option-group select, .option-group input[type="text"], .option-group input[type="number"], .option-group textarea { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:var(--bg-secondary); color:var(--text-primary); font-size:.88rem; transition:all .3s; outline:none; font-family:inherit; }
+    .option-group select:focus, .option-group input:focus, .option-group textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
+    .option-group textarea { resize:vertical; min-height:60px; }
+    .quality-display { display:flex; align-items:center; gap:10px; }
+    .quality-display input[type="range"] { flex:1; accent-color:var(--accent); }
+    .quality-value { font-weight:700; font-size:.9rem; color:var(--accent); min-width:38px; text-align:right; }
+    .checkbox-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+    .checkbox-row input[type="checkbox"] { accent-color:var(--accent); width:16px; height:16px; }
+    .checkbox-row label { font-size:.84rem; color:var(--text-secondary); text-transform:none; letter-spacing:0; }
+
+    /* BUTTONS */
+    .convert-btn { width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:#fff; font-size:1rem; font-weight:700; cursor:pointer; transition:all .3s; box-shadow:0 4px 20px rgba(102,126,234,0.35); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .convert-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(102,126,234,0.5); }
+    .convert-btn:active { transform:translateY(0); }
+    .convert-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
+    .convert-btn .spinner { width:18px; height:18px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+    .btn-secondary { padding:10px 18px; border:1px solid var(--border); border-radius:10px; background:var(--bg-drop); color:var(--text-primary); font-weight:600; font-size:.88rem; cursor:pointer; transition:all .3s; }
+    .btn-secondary:hover { border-color:var(--accent); background:var(--accent); color:#fff; }
+
+    /* PROGRESS */
+    .progress-section { margin-top:16px; animation:slideIn .3s; }
+    .progress-bar { width:100%; height:7px; background:var(--bg-drop); border-radius:10px; overflow:hidden; }
+    .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--gradient-1),var(--gradient-2),var(--gradient-1)); background-size:200% 100%; border-radius:10px; transition:width .3s; animation:shimmer 2s linear infinite; }
+    .progress-text { text-align:center; font-size:.82rem; color:var(--text-secondary); margin-top:8px; }
+
+    /* STATS */
+    .stats-bar { margin-top:12px; display:flex; gap:12px; flex-wrap:wrap; }
+    .stat-card { flex:1; min-width:120px; padding:12px; background:var(--bg-drop); border:1px solid var(--border); border-radius:12px; text-align:center; animation:slideIn .3s; }
+    .stat-value { font-size:1.2rem; font-weight:700; color:var(--accent); }
+    .stat-label { font-size:.72rem; color:var(--text-muted); margin-top:2px; text-transform:uppercase; }
+    .stat-card.green .stat-value { color:var(--success); }
+    .stat-card.red .stat-value { color:var(--danger); }
+
+    /* RESULTS */
+    .results { margin-top:16px; display:flex; flex-direction:column; gap:8px; }
+    .result-card { display:flex; align-items:center; gap:12px; padding:12px 16px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:12px; animation:slideIn .3s; }
+    .result-icon { width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.15); display:flex; align-items:center; justify-content:center; font-size:1.1rem; color:var(--success); flex-shrink:0; }
+    .result-info { flex:1; min-width:0; }
+    .result-name { font-weight:600; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .result-size { font-size:.75rem; color:var(--text-muted); margin-top:2px; }
+    .result-download { padding:7px 16px; border:none; border-radius:10px; background:var(--success); color:#fff; font-weight:600; font-size:.82rem; cursor:pointer; transition:all .2s; flex-shrink:0; }
+    .result-download:hover { transform:scale(1.05); box-shadow:0 4px 12px rgba(16,185,129,0.35); }
+    .download-all-btn { width:100%; padding:12px; border:2px solid var(--success); border-radius:14px; background:rgba(16,185,129,0.1); color:var(--success); font-size:.9rem; font-weight:700; cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .download-all-btn:hover { background:var(--success); color:#fff; }
+
+    /* PREVIEW AREA */
+    .preview-area { margin-top:16px; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:var(--bg-drop); animation:slideIn .3s; }
+    .preview-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border); }
+    .preview-header h4 { font-size:.88rem; }
+    .preview-body { display:flex; gap:0; min-height:200px; }
+    .preview-side { flex:1; padding:16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .preview-side:first-child { border-right:1px solid var(--border); }
+    .preview-side img, .preview-side canvas { max-width:100%; max-height:300px; border-radius:8px; }
+    .preview-label { font-size:.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; }
+    .preview-size { font-size:.75rem; color:var(--text-muted); margin-top:6px; }
+
+    /* CROP AREA */
+    .crop-container { position:relative; display:inline-block; cursor:crosshair; margin:16px auto; max-width:100%; }
+    .crop-container canvas { display:block; max-width:100%; border-radius:8px; }
+    .crop-info { text-align:center; font-size:.82rem; color:var(--text-muted); margin-top:8px; }
+
+    /* COLOR PICKER */
+    .color-result { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-top:16px; padding:16px; background:var(--bg-drop); border:1px solid var(--border); border-radius:14px; }
+    .color-swatch { width:80px; height:80px; border-radius:14px; border:3px solid var(--border); flex-shrink:0; }
+    .color-values { display:flex; flex-direction:column; gap:6px; }
+    .color-values .cv { display:flex; align-items:center; gap:8px; font-size:.85rem; }
+    .color-values .cv span:first-child { font-weight:700; min-width:40px; color:var(--text-muted); }
+    .color-values .cv code { background:var(--bg-secondary); padding:3px 8px; border-radius:6px; font-size:.82rem; cursor:pointer; transition:background .2s; }
+    .color-values .cv code:hover { background:var(--accent); color:#fff; }
+    .color-palette { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+    .palette-color { width:36px; height:36px; border-radius:8px; border:2px solid var(--border); cursor:pointer; transition:transform .2s; }
+    .palette-color:hover { transform:scale(1.15); }
+
+    /* QR CODE */
+    .qr-output { text-align:center; margin-top:16px; }
+    .qr-output canvas { border-radius:12px; border:4px solid #fff; box-shadow:0 4px 20px var(--shadow); }
+
+    /* BASE64 */
+    .base64-output { margin-top:12px; }
+    .base64-output textarea { width:100%; min-height:100px; padding:10px; border:1px solid var(--border); border-radius:10px; background:var(--bg-secondary); color:var(--text-primary); font-family:monospace; font-size:.78rem; resize:vertical; outline:none; }
+    .base64-output textarea:focus { border-color:var(--accent); }
+
+    /* HISTORY */
+    .history-section { margin-top:16px; }
+    .history-item { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg-drop); border:1px solid var(--border); border-radius:10px; margin-bottom:6px; font-size:.82rem; }
+    .history-item .hi-icon { font-size:1.1rem; }
+    .history-item .hi-info { flex:1; }
+    .history-item .hi-date { font-size:.72rem; color:var(--text-muted); }
+    .history-item .hi-detail { font-weight:600; }
+    .history-item .hi-sizes { color:var(--text-muted); font-size:.75rem; }
+    .history-clear { margin-top:10px; }
+
+    /* ABOUT */
+    .about-section h2 { font-size:1.3rem; margin-bottom:16px; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .about-section h3 { font-size:1rem; margin:16px 0 8px; color:var(--text-primary); }
+    .about-section p, .about-section li { font-size:.88rem; color:var(--text-secondary); line-height:1.6; }
+    .about-section ul { padding-left:20px; }
+    .about-section li { margin-bottom:4px; }
+    .feature-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:12px; }
+    .feature-card { padding:16px; background:var(--bg-drop); border:1px solid var(--border); border-radius:12px; text-align:center; }
+    .feature-card .fc-icon { font-size:1.8rem; margin-bottom:8px; }
+    .feature-card .fc-title { font-weight:700; font-size:.88rem; margin-bottom:4px; }
+    .feature-card .fc-desc { font-size:.78rem; color:var(--text-muted); }
+
+    /* TOAST */
+    .toast-container { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+    .toast { padding:12px 18px; border-radius:12px; backdrop-filter:blur(20px); color:#fff; font-weight:600; font-size:.84rem; box-shadow:0 8px 30px rgba(0,0,0,0.2); animation:toastIn .4s ease, toastOut .4s ease 2.6s forwards; display:flex; align-items:center; gap:8px; }
+    .toast.success { background:rgba(16,185,129,0.92); }
+    .toast.error { background:rgba(239,68,68,0.92); }
+    .toast.warning { background:rgba(245,158,11,0.92); }
+    .toast.info { background:rgba(99,102,241,0.92); }
+
+    /* FFMPEG */
+    .ffmpeg-notice { margin-top:14px; padding:12px 16px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:12px; font-size:.82rem; color:var(--text-secondary); display:flex; align-items:center; gap:10px; }
+    .ffmpeg-notice .loader { width:16px; height:16px; border:2px solid rgba(99,102,241,0.3); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
+
+    /* FOOTER */
+    footer { text-align:center; padding:18px; margin-top:16px; color:var(--text-muted); font-size:.78rem; }
+    .privacy-badge { display:inline-flex; align-items:center; gap:6px; margin-top:6px; padding:4px 12px; background:rgba(16,185,129,0.1); border-radius:20px; color:var(--success); font-size:.72rem; font-weight:600; }
+
+    .hidden { display:none !important; }
+
+    /* COOKIE BANNER */
+    .cookie-banner { position:fixed; bottom:0; left:0; right:0; z-index:9998; padding:16px 24px; background:var(--bg-card); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; animation:slideIn .4s; }
+    .cookie-banner p { font-size:.84rem; color:var(--text-secondary); max-width:600px; text-align:center; }
+    .cookie-btns { display:flex; gap:8px; }
+    .cookie-accept { padding:8px 20px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:#fff; font-weight:600; font-size:.84rem; cursor:pointer; transition:all .3s; }
+    .cookie-accept:hover { transform:scale(1.05); }
+    .cookie-decline { padding:8px 20px; border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--text-secondary); font-weight:600; font-size:.84rem; cursor:pointer; transition:all .3s; }
+
+    /* CONFETTI */
+    .confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9997; }
+
+    /* INTERSTITIAL AD */
+    .interstitial-overlay { position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; }
+    .interstitial-content { background:var(--bg-card); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border:1px solid var(--border); border-radius:20px; padding:32px; max-width:500px; width:90%; text-align:center; animation:slideIn .4s; }
+    .interstitial-content h3 { font-size:1.2rem; margin-bottom:16px; }
+    .interstitial-ad-box { min-height:250px; border:2px dashed var(--border); border-radius:14px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:.82rem; margin-bottom:16px; background:var(--bg-drop); }
+    .interstitial-timer { font-size:.9rem; color:var(--text-muted); margin-bottom:12px; }
+    .interstitial-close { padding:10px 24px; border:none; border-radius:12px; background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2)); color:#fff; font-weight:700; cursor:pointer; transition:all .3s; opacity:.5; pointer-events:none; }
+    .interstitial-close.active { opacity:1; pointer-events:auto; }
+    .interstitial-close.active:hover { transform:translateY(-2px); }
+
+    /* DRAG REORDER */
+    .file-card[draggable="true"] { cursor:default; }
+    .file-card.dragging { opacity:.4; border:2px dashed var(--accent); }
+    .file-card.drag-over-card { border-top:3px solid var(--accent); }
+    .drag-handle { cursor:grab; font-size:1rem; color:var(--text-muted); padding:0 4px; user-select:none; flex-shrink:0; }
+    .drag-handle:active { cursor:grabbing; }
+
+    /* PRESET CHIPS */
+    .presets-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .preset-chip { padding:5px 12px; border:1px solid var(--border); border-radius:8px; background:var(--bg-drop); color:var(--text-secondary); font-size:.74rem; cursor:pointer; transition:all .2s; white-space:nowrap; }
+    .preset-chip:hover { border-color:var(--accent); color:var(--text-primary); background:rgba(99,102,241,0.1); }
+
+    /* TXT2IMG */
+    .txt2img-preview { margin-top:12px; text-align:center; }
+    .txt2img-preview canvas { border-radius:10px; border:1px solid var(--border); max-width:100%; }
+
+    /* ASCII OUTPUT */
+    .ascii-output { margin-top:12px; }
+    .ascii-output pre { background:var(--bg-drop); border:1px solid var(--border); border-radius:10px; padding:12px; font-size:.45rem; line-height:.55rem; overflow-x:auto; font-family:'Courier New',monospace; color:var(--text-primary); white-space:pre; }
+
+    /* RESPONSIVE */
+    @media(max-width:640px) {
+      .app { padding:10px; }
+      header { padding:12px 16px; border-radius:14px; }
+      .logo h1 { font-size:1.15rem; }
+      .tabs { gap:3px; }
+      .tab { padding:8px 4px; font-size:.72rem; gap:3px; }
+      .tab .tab-icon { display:none; }
+      main { padding:16px; border-radius:14px; }
+      .drop-zone { padding:28px 12px; }
+      .drop-icon { font-size:2rem; }
+      .options-row { flex-direction:column; }
+      .preview-body { flex-direction:column; }
+      .preview-side:first-child { border-right:none; border-bottom:1px solid var(--border); }
+      .sub-tools { gap:4px; }
+      .sub-tool { padding:6px 10px; font-size:.74rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">C</div>
+        <div>
+          <h1>ConvertAll</h1>
+          <small data-i18n="subtitle">Convertisseur de fichiers gratuit</small>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn lang-btn" id="langBtn" title="Language">FR</button>
+        <button class="header-btn" id="historyBtn" title="Historique">📋</button>
+        <button class="header-btn" id="themeToggle" title="Thème">🌙</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="images"><span class="tab-icon">🖼️</span> <span data-i18n="tab_images">Images</span></button>
+      <button class="tab" data-tab="documents"><span class="tab-icon">📄</span> <span data-i18n="tab_docs">Documents</span></button>
+      <button class="tab" data-tab="media"><span class="tab-icon">🎬</span> <span data-i18n="tab_media">Vidéo/Audio</span></button>
+      <button class="tab" data-tab="tools"><span class="tab-icon">🔧</span> <span data-i18n="tab_tools">Outils</span></button>
+      <button class="tab" data-tab="about"><span class="tab-icon">ℹ️</span> <span data-i18n="tab_about">À propos</span></button>
+    </nav>
+
+    <main>
+      <!-- AD TOP -->
+      <div class="ad-space" id="adTop">
+        <span>📢 Espace publicitaire — Insérez votre code AdSense ici</span>
+      </div>
+
+      <!-- SUB TOOLS -->
+      <div class="sub-tools" id="subTools"></div>
+
+      <!-- DROP ZONE -->
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon" id="dropIcon">🖼️</div>
+        <h3 data-i18n="drop_title">Glissez vos fichiers ici</h3>
+        <p data-i18n="drop_sub">ou cliquez pour sélectionner</p>
+        <p class="formats-hint" id="formatsHint">PNG, JPG, WebP, BMP, GIF, SVG</p>
+        <input type="file" id="fileInput" multiple hidden>
+      </div>
+
+      <!-- FILES -->
+      <div class="files-list" id="filesList"></div>
+
+      <!-- BATCH RENAME -->
+      <div class="options-panel hidden" id="batchRenamePanel">
+        <div class="option-group">
+          <label data-i18n="batch_pattern">Modèle de renommage</label>
+          <input type="text" id="batchPattern" placeholder="{name}_{index}.{ext}" value="{name}.{ext}">
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px" data-i18n="batch_help">{name} = nom original, {index} = numéro, {ext} = extension de sortie</div>
+        </div>
+      </div>
+
+      <!-- OPTIONS PANEL -->
+      <div class="options-panel hidden" id="optionsPanel">
+        <!-- Row 1: Format + Quality -->
+        <div class="options-row" id="formatRow">
+          <div class="option-group" id="formatGroup">
+            <label data-i18n="output_format">Format de sortie</label>
+            <select id="outputFormat"></select>
+          </div>
+          <div class="option-group" id="qualityGroup">
+            <label data-i18n="quality">Qualité</label>
+            <div class="quality-display">
+              <input type="range" id="qualitySlider" min="10" max="100" value="90" step="5">
+              <span class="quality-value" id="qualityValue">90%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Resize -->
+        <div class="options-row hidden" id="resizeRow" style="margin-top:12px">
+          <div class="option-group">
+            <label data-i18n="width">Largeur (px)</label>
+            <input type="number" id="resizeW" placeholder="Auto" min="1">
+          </div>
+          <div class="option-group">
+            <label data-i18n="height">Hauteur (px)</label>
+            <input type="number" id="resizeH" placeholder="Auto" min="1">
+          </div>
+          <div class="option-group" style="min-width:auto;flex:0">
+            <label>&nbsp;</label>
+            <div class="checkbox-row">
+              <input type="checkbox" id="keepRatio" checked>
+              <label for="keepRatio" data-i18n="keep_ratio">Garder le ratio</label>
+            </div>
+          </div>
+        </div>
+        <!-- Resize Presets -->
+        <div class="hidden" id="presetsRow" style="margin-top:8px">
+          <label style="font-size:.74rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block" data-i18n="presets">Presets</label>
+          <div class="presets-row" id="presetsContainer"></div>
+        </div>
+
+        <!-- Row 3: Rotation -->
+        <div class="options-row hidden" id="rotateRow" style="margin-top:12px">
+          <div class="option-group">
+            <label data-i18n="rotation">Rotation</label>
+            <select id="rotateAngle">
+              <option value="0">0°</option>
+              <option value="90">90° →</option>
+              <option value="180">180°</option>
+              <option value="270">270° ←</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label data-i18n="flip">Miroir</label>
+            <select id="flipMode">
+              <option value="none">Aucun</option>
+              <option value="h">Horizontal ↔</option>
+              <option value="v">Vertical ↕</option>
+              <option value="both">Les deux</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- PDF pages -->
+        <div class="options-row hidden" id="pdfPageRow" style="margin-top:12px">
+          <div class="option-group">
+            <label data-i18n="pdf_pages">Pages (ex: 1-3, 5, 8)</label>
+            <input type="text" id="pdfPages" placeholder="Toutes les pages">
+          </div>
+        </div>
+
+        <!-- BG removal tolerance -->
+        <div class="options-row hidden" id="bgRemovalRow" style="margin-top:12px">
+          <div class="option-group">
+            <label data-i18n="tolerance">Tolérance</label>
+            <div class="quality-display">
+              <input type="range" id="bgTolerance" min="0" max="100" value="30" step="1">
+              <span class="quality-value" id="bgToleranceValue">30</span>
+            </div>
+          </div>
+          <div class="option-group">
+            <label data-i18n="bg_color">Couleur de fond à supprimer</label>
+            <select id="bgColorMode">
+              <option value="auto">Auto (coins)</option>
+              <option value="white">Blanc</option>
+              <option value="black">Noir</option>
+              <option value="green">Vert (green screen)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="convert-btn" id="convertBtn">⚡ <span data-i18n="convert">Convertir</span></button>
+      </div>
+
+      <!-- QR CODE SECTION -->
+      <div class="hidden" id="qrSection">
+        <div class="options-panel">
+          <div class="option-group">
+            <label data-i18n="qr_content">Contenu du QR Code</label>
+            <textarea id="qrInput" placeholder="https://example.com" rows="3"></textarea>
+          </div>
+          <div class="options-row" style="margin-top:12px">
+            <div class="option-group">
+              <label data-i18n="qr_size">Taille (px)</label>
+              <input type="number" id="qrSize" value="300" min="100" max="1000" step="50">
+            </div>
+            <div class="option-group">
+              <label data-i18n="qr_color">Couleur</label>
+              <input type="text" id="qrColor" value="#000000" placeholder="#000000">
+            </div>
+            <div class="option-group">
+              <label data-i18n="qr_bg">Fond</label>
+              <input type="text" id="qrBg" value="#ffffff" placeholder="#ffffff">
+            </div>
+          </div>
+          <button class="convert-btn" id="qrBtn">⚡ <span data-i18n="generate">Générer le QR Code</span></button>
+        </div>
+        <div class="qr-output hidden" id="qrOutput"></div>
+      </div>
+
+      <!-- BASE64 SECTION -->
+      <div class="hidden" id="base64Section">
+        <div class="options-panel">
+          <div class="option-group">
+            <label data-i18n="b64_mode">Mode</label>
+            <select id="base64Mode">
+              <option value="to">Image → Base64</option>
+              <option value="from">Base64 → Image</option>
+            </select>
+          </div>
+          <div class="hidden" id="base64InputArea" style="margin-top:12px">
+            <div class="option-group">
+              <label data-i18n="b64_paste">Collez le Base64 ici</label>
+              <textarea id="base64Input" rows="5" placeholder="data:image/png;base64,iVBOR..."></textarea>
+            </div>
+            <button class="convert-btn" id="base64DecodeBtn">⚡ <span data-i18n="b64_decode">Décoder en image</span></button>
+          </div>
+        </div>
+        <div class="base64-output hidden" id="base64Output">
+          <div class="option-group">
+            <label>Base64</label>
+            <textarea id="base64Result" readonly></textarea>
+          </div>
+          <button class="btn-secondary" id="base64CopyBtn" style="margin-top:8px" data-i18n="copy">📋 Copier</button>
+        </div>
+      </div>
+
+      <!-- TXT2IMG SECTION -->
+      <div class="hidden" id="txt2imgSection">
+        <div class="options-panel">
+          <div class="option-group">
+            <label data-i18n="txt2img_text">Texte à convertir en image</label>
+            <textarea id="txt2imgInput" rows="4" placeholder="Votre texte ici..."></textarea>
+          </div>
+          <div class="options-row" style="margin-top:12px">
+            <div class="option-group">
+              <label data-i18n="txt2img_font">Taille police</label>
+              <input type="number" id="txt2imgFontSize" value="32" min="8" max="200">
+            </div>
+            <div class="option-group">
+              <label data-i18n="txt2img_color">Couleur texte</label>
+              <input type="text" id="txt2imgColor" value="#ffffff" placeholder="#ffffff">
+            </div>
+            <div class="option-group">
+              <label data-i18n="txt2img_bg">Couleur fond</label>
+              <input type="text" id="txt2imgBg" value="#1a1a2e" placeholder="#1a1a2e">
+            </div>
+          </div>
+          <button class="convert-btn" id="txt2imgBtn">⚡ <span data-i18n="txt2img_gen">Générer l'image</span></button>
+        </div>
+        <div class="txt2img-preview hidden" id="txt2imgPreview"></div>
+      </div>
+
+      <!-- ASCII ART SECTION -->
+      <div class="hidden" id="asciiSection">
+        <div class="options-panel">
+          <div class="option-group">
+            <label data-i18n="ascii_width">Largeur (caractères)</label>
+            <input type="number" id="asciiWidth" value="100" min="20" max="300">
+          </div>
+          <button class="convert-btn" id="asciiBtn" style="margin-top:12px">⚡ <span data-i18n="ascii_gen">Générer l'ASCII Art</span></button>
+        </div>
+        <div class="ascii-output hidden" id="asciiOutput">
+          <pre id="asciiResult"></pre>
+          <button class="btn-secondary" id="asciiCopyBtn" style="margin-top:8px">📋 Copier</button>
+          <button class="btn-secondary" id="asciiDownloadBtn" style="margin-top:8px;margin-left:8px">⬇ Télécharger .txt</button>
+        </div>
+      </div>
+
+      <!-- COLOR PICKER CANVAS -->
+      <div class="hidden" id="colorPickerArea">
+        <div style="text-align:center;margin-top:16px">
+          <canvas id="colorCanvas" style="max-width:100%;border-radius:10px;cursor:crosshair"></canvas>
+        </div>
+        <div class="color-result hidden" id="colorResult">
+          <div class="color-swatch" id="colorSwatch"></div>
+          <div class="color-values" id="colorValues"></div>
+        </div>
+        <div class="hidden" id="paletteArea">
+          <p style="font-size:.82rem;font-weight:600;margin-top:12px;color:var(--text-secondary)" data-i18n="palette">Palette extraite :</p>
+          <div class="color-palette" id="colorPalette"></div>
+        </div>
+      </div>
+
+      <!-- CROP AREA -->
+      <div class="hidden" id="cropArea">
+        <div class="crop-container" id="cropContainer">
+          <canvas id="cropCanvas"></canvas>
+        </div>
+        <div class="crop-info" id="cropInfo" data-i18n="crop_hint">Cliquez et glissez pour sélectionner la zone à recadrer</div>
+      </div>
+
+      <!-- PREVIEW BEFORE/AFTER -->
+      <div class="preview-area hidden" id="previewArea">
+        <div class="preview-header">
+          <h4 data-i18n="preview">Aperçu</h4>
+          <button class="btn-secondary" id="closePreview" style="padding:4px 12px;font-size:.78rem">✕</button>
+        </div>
+        <div class="preview-body">
+          <div class="preview-side">
+            <div class="preview-label" data-i18n="before">Avant</div>
+            <img id="previewBefore" src="">
+            <div class="preview-size" id="previewSizeBefore"></div>
+          </div>
+          <div class="preview-side">
+            <div class="preview-label" data-i18n="after">Après</div>
+            <img id="previewAfter" src="">
+            <div class="preview-size" id="previewSizeAfter"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-bar hidden" id="statsBar"></div>
+
+      <!-- PROGRESS -->
+      <div class="progress-section hidden" id="progressSection">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <p class="progress-text" id="progressText">Conversion en cours...</p>
+      </div>
+
+      <!-- FFMPEG NOTICE -->
+      <div class="ffmpeg-notice hidden" id="ffmpegNotice">
+        <div class="loader"></div>
+        <span data-i18n="ffmpeg_loading">Chargement du moteur vidéo/audio...</span>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results" id="results"></div>
+
+      <!-- AD BOTTOM -->
+      <div class="ad-space" id="adBottom" style="margin-top:16px">
+        <span>📢 Espace publicitaire — Insérez votre code AdSense ici</span>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="history-section hidden" id="historySection">
+        <h4 style="margin-bottom:12px" data-i18n="history_title">📋 Historique des conversions</h4>
+        <div id="historyList"></div>
+        <button class="btn-secondary history-clear" id="historyClear" data-i18n="history_clear">🗑️ Vider l'historique</button>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="about-section hidden" id="aboutSection">
+        <h2>ConvertAll</h2>
+        <p data-i18n="about_desc">ConvertAll est un convertisseur de fichiers 100% gratuit et respectueux de votre vie privée. Tous les fichiers sont traités directement dans votre navigateur — rien n'est envoyé sur un serveur.</p>
+
+        <h3 data-i18n="about_features">Fonctionnalités</h3>
+        <div class="feature-grid">
+          <div class="feature-card"><div class="fc-icon">🖼️</div><div class="fc-title" data-i18n="feat_img">Images</div><div class="fc-desc" data-i18n="feat_img_d">PNG, JPG, WebP + redimensionner, compresser, recadrer, pivoter</div></div>
+          <div class="feature-card"><div class="fc-icon">📄</div><div class="fc-title" data-i18n="feat_doc">Documents</div><div class="fc-desc" data-i18n="feat_doc_d">Images→PDF, fusion, extraction de pages</div></div>
+          <div class="feature-card"><div class="fc-icon">🎬</div><div class="fc-title" data-i18n="feat_media">Vidéo/Audio</div><div class="fc-desc" data-i18n="feat_media_d">MP4, WebM, GIF, MP3, WAV, OGG</div></div>
+          <div class="feature-card"><div class="fc-icon">📱</div><div class="fc-title" data-i18n="feat_qr">QR Code</div><div class="fc-desc" data-i18n="feat_qr_d">Générateur de QR Codes personnalisés</div></div>
+          <div class="feature-card"><div class="fc-icon">🎨</div><div class="fc-title" data-i18n="feat_color">Pipette</div><div class="fc-desc" data-i18n="feat_color_d">Extraire les couleurs d'une image</div></div>
+          <div class="feature-card"><div class="fc-icon">🔒</div><div class="fc-title" data-i18n="feat_priv">Privé</div><div class="fc-desc" data-i18n="feat_priv_d">100% local, aucun fichier uploadé</div></div>
+        </div>
+
+        <h3 data-i18n="about_tech">Technologies</h3>
+        <ul>
+          <li>Canvas API — conversion d'images</li>
+          <li>pdf-lib — manipulation PDF</li>
+          <li>FFmpeg.wasm — conversion vidéo/audio</li>
+          <li>QRCode.js — génération QR</li>
+        </ul>
+      </div>
+    </main>
+
+    <footer>
+      <p>ConvertAll — <span data-i18n="footer">Convertisseur de fichiers 100% gratuit</span></p>
+      <div class="privacy-badge">🔒 <span data-i18n="privacy">Vos fichiers restent sur votre appareil</span></div>
+    </footer>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- COOKIE BANNER RGPD -->
+  <div class="cookie-banner hidden" id="cookieBanner">
+    <p data-i18n="cookie_text">🍪 Ce site utilise des cookies pour améliorer votre expérience et afficher des publicités. En continuant, vous acceptez notre politique de cookies.</p>
+    <div class="cookie-btns">
+      <button class="cookie-accept" id="cookieAccept" data-i18n="cookie_accept">Accepter</button>
+      <button class="cookie-decline" id="cookieDecline" data-i18n="cookie_decline">Refuser</button>
+    </div>
+  </div>
+
+  <!-- INTERSTITIAL AD -->
+  <div class="interstitial-overlay hidden" id="interstitialOverlay">
+    <div class="interstitial-content">
+      <h3 data-i18n="interstitial_title">📢 Publicité</h3>
+      <div class="interstitial-ad-box">
+        <span>Espace publicitaire — Insérez votre code AdSense ici</span>
+      </div>
+      <div class="interstitial-timer" id="interstitialTimer">Fermeture dans 5s...</div>
+      <button class="interstitial-close" id="interstitialClose" data-i18n="interstitial_close">Continuer</button>
+    </div>
+  </div>
+
+  <script>
+    // ======================== TRANSLATIONS ========================
+    const LANGS = {
+      fr: {
+        subtitle:'Convertisseur de fichiers gratuit', tab_images:'Images', tab_docs:'Documents', tab_media:'Vidéo/Audio', tab_tools:'Outils', tab_about:'À propos',
+        drop_title:'Glissez vos fichiers ici', drop_sub:'ou cliquez pour sélectionner', output_format:'Format de sortie', quality:'Qualité', convert:'Convertir',
+        width:'Largeur (px)', height:'Hauteur (px)', keep_ratio:'Garder le ratio', rotation:'Rotation', flip:'Miroir',
+        pdf_pages:'Pages (ex: 1-3, 5, 8)', tolerance:'Tolérance', bg_color:'Couleur de fond à supprimer',
+        qr_content:'Contenu du QR Code', qr_size:'Taille (px)', qr_color:'Couleur', qr_bg:'Fond', generate:'Générer le QR Code',
+        b64_mode:'Mode', b64_paste:'Collez le Base64 ici', b64_decode:'Décoder en image', copy:'📋 Copier',
+        palette:'Palette extraite :', crop_hint:'Cliquez et glissez pour sélectionner la zone à recadrer',
+        preview:'Aperçu', before:'Avant', after:'Après',
+        history_title:'📋 Historique des conversions', history_clear:'🗑️ Vider l\'historique',
+        batch_pattern:'Modèle de renommage', batch_help:'{name} = nom original, {index} = numéro, {ext} = extension de sortie',
+        about_desc:'ConvertAll est un convertisseur de fichiers 100% gratuit et respectueux de votre vie privée. Tous les fichiers sont traités directement dans votre navigateur — rien n\'est envoyé sur un serveur.',
+        about_features:'Fonctionnalités', about_tech:'Technologies',
+        feat_img:'Images', feat_img_d:'PNG, JPG, WebP + redimensionner, compresser, recadrer, pivoter',
+        feat_doc:'Documents', feat_doc_d:'Images→PDF, fusion, extraction de pages',
+        feat_media:'Vidéo/Audio', feat_media_d:'MP4, WebM, GIF, MP3, WAV, OGG',
+        feat_qr:'QR Code', feat_qr_d:'Générateur de QR Codes personnalisés',
+        feat_color:'Pipette', feat_color_d:'Extraire les couleurs d\'une image',
+        feat_priv:'Privé', feat_priv_d:'100% local, aucun fichier uploadé',
+        footer:'Convertisseur de fichiers 100% gratuit', privacy:'Vos fichiers restent sur votre appareil',
+        ffmpeg_loading:'Chargement du moteur vidéo/audio...',
+        // Sub tools
+        st_convert:'Convertir', st_resize:'Redimensionner', st_compress:'Compresser', st_crop:'Recadrer', st_rotate:'Pivoter', st_favicon:'Favicon',
+        st_qr:'QR Code', st_color:'Pipette', st_base64:'Base64', st_rmbg:'Suppr. fond', st_exif:'Suppr. EXIF', st_txt2img:'Texte→Image', st_ascii:'ASCII Art',
+        presets:'Presets',
+        txt2img_text:'Texte à convertir en image', txt2img_font:'Taille police', txt2img_color:'Couleur texte', txt2img_bg:'Couleur fond', txt2img_gen:'Générer l\'image',
+        ascii_width:'Largeur (caractères)', ascii_gen:'Générer l\'ASCII Art',
+        cookie_text:'🍪 Ce site utilise des cookies pour améliorer votre expérience et afficher des publicités. En continuant, vous acceptez notre politique de cookies.',
+        cookie_accept:'Accepter', cookie_decline:'Refuser',
+        interstitial_title:'📢 Publicité', interstitial_close:'Continuer',
+      },
+      en: {
+        subtitle:'Free file converter', tab_images:'Images', tab_docs:'Documents', tab_media:'Video/Audio', tab_tools:'Tools', tab_about:'About',
+        drop_title:'Drop your files here', drop_sub:'or click to select', output_format:'Output format', quality:'Quality', convert:'Convert',
+        width:'Width (px)', height:'Height (px)', keep_ratio:'Keep ratio', rotation:'Rotation', flip:'Flip',
+        pdf_pages:'Pages (e.g. 1-3, 5, 8)', tolerance:'Tolerance', bg_color:'Background color to remove',
+        qr_content:'QR Code content', qr_size:'Size (px)', qr_color:'Color', qr_bg:'Background', generate:'Generate QR Code',
+        b64_mode:'Mode', b64_paste:'Paste Base64 here', b64_decode:'Decode to image', copy:'📋 Copy',
+        palette:'Extracted palette:', crop_hint:'Click and drag to select crop area',
+        preview:'Preview', before:'Before', after:'After',
+        history_title:'📋 Conversion history', history_clear:'🗑️ Clear history',
+        batch_pattern:'Rename pattern', batch_help:'{name} = original name, {index} = number, {ext} = output extension',
+        about_desc:'ConvertAll is a 100% free and privacy-friendly file converter. All files are processed directly in your browser — nothing is uploaded to any server.',
+        about_features:'Features', about_tech:'Technologies',
+        feat_img:'Images', feat_img_d:'PNG, JPG, WebP + resize, compress, crop, rotate',
+        feat_doc:'Documents', feat_doc_d:'Images→PDF, merge, page extraction',
+        feat_media:'Video/Audio', feat_media_d:'MP4, WebM, GIF, MP3, WAV, OGG',
+        feat_qr:'QR Code', feat_qr_d:'Custom QR Code generator',
+        feat_color:'Color Picker', feat_color_d:'Extract colors from images',
+        feat_priv:'Private', feat_priv_d:'100% local, no files uploaded',
+        footer:'Free file converter', privacy:'Your files stay on your device',
+        ffmpeg_loading:'Loading video/audio engine...',
+        st_convert:'Convert', st_resize:'Resize', st_compress:'Compress', st_crop:'Crop', st_rotate:'Rotate', st_favicon:'Favicon',
+        st_qr:'QR Code', st_color:'Color Picker', st_base64:'Base64', st_rmbg:'Remove BG', st_exif:'Remove EXIF', st_txt2img:'Text→Image', st_ascii:'ASCII Art',
+        presets:'Presets',
+        txt2img_text:'Text to convert to image', txt2img_font:'Font size', txt2img_color:'Text color', txt2img_bg:'Background color', txt2img_gen:'Generate image',
+        ascii_width:'Width (characters)', ascii_gen:'Generate ASCII Art',
+        cookie_text:'🍪 This site uses cookies to improve your experience and display ads. By continuing, you accept our cookie policy.',
+        cookie_accept:'Accept', cookie_decline:'Decline',
+        interstitial_title:'📢 Advertisement', interstitial_close:'Continue',
+      }
+    };
+
+    let currentLang = localStorage.getItem('convertall-lang') || 'fr';
+
+    function applyLang() {
+      const t = LANGS[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+      });
+      document.getElementById('langBtn').textContent = currentLang.toUpperCase();
+      buildSubTools();
+    }
+
+    document.getElementById('langBtn').addEventListener('click', () => {
+      currentLang = currentLang === 'fr' ? 'en' : 'fr';
+      localStorage.setItem('convertall-lang', currentLang);
+      applyLang();
+    });
+
+    // ======================== STATE ========================
+    let currentTab = 'images';
+    let currentSubTool = 'convert';
+    let selectedFiles = [];
+    let convertedFiles = [];
+    let ffmpegInstance = null;
+    let ffmpegLoading = false;
+
+    // Crop state
+    let cropImg = null, cropStartX=0, cropStartY=0, cropEndX=0, cropEndY=0, isCropping=false, cropScale=1;
+
+    // ======================== DOM ========================
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+
+    // ======================== THEME ========================
+    function initTheme() {
+      const saved = localStorage.getItem('convertall-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+      $('#themeToggle').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    }
+    $('#themeToggle').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      $('#themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('convertall-theme', next);
+    });
+
+    // ======================== TABS ========================
+    const SUB_TOOLS = {
+      images: [
+        { id:'convert', icon:'🔄', i18n:'st_convert' },
+        { id:'resize', icon:'↔️', i18n:'st_resize' },
+        { id:'compress', icon:'📦', i18n:'st_compress' },
+        { id:'crop', icon:'✂️', i18n:'st_crop' },
+        { id:'rotate', icon:'🔃', i18n:'st_rotate' },
+        { id:'favicon', icon:'⭐', i18n:'st_favicon' },
+      ],
+      tools: [
+        { id:'qrcode', icon:'📱', i18n:'st_qr' },
+        { id:'colorpicker', icon:'🎨', i18n:'st_color' },
+        { id:'base64', icon:'🔤', i18n:'st_base64' },
+        { id:'removebg', icon:'🖼️', i18n:'st_rmbg' },
+        { id:'exif', icon:'🔒', i18n:'st_exif' },
+        { id:'txt2img', icon:'🔠', i18n:'st_txt2img' },
+        { id:'ascii', icon:'🎭', i18n:'st_ascii' },
+      ],
+    };
+
+    function buildSubTools() {
+      const cont = $('#subTools');
+      cont.innerHTML = '';
+      const tools = SUB_TOOLS[currentTab];
+      if (!tools) { cont.classList.add('hidden'); return; }
+      cont.classList.remove('hidden');
+      const t = LANGS[currentLang];
+      // Preserve current sub-tool if it exists in this tab
+      const validIds = tools.map(st => st.id);
+      if (!validIds.includes(currentSubTool)) currentSubTool = tools[0].id;
+      tools.forEach((st) => {
+        const btn = document.createElement('button');
+        btn.className = 'sub-tool' + (st.id === currentSubTool ? ' active' : '');
+        btn.dataset.subtool = st.id;
+        btn.textContent = st.icon + ' ' + (t[st.i18n] || st.id);
+        btn.addEventListener('click', () => {
+          cont.querySelectorAll('.sub-tool').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentSubTool = st.id;
+          updateUI();
+        });
+        cont.appendChild(btn);
+      });
+    }
+
+    $$('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        $$('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentTab = tab.dataset.tab;
+        buildSubTools();
+        clearFiles();
+        clearResults();
+        updateUI();
+      });
+    });
+
+    const TAB_CONFIG = {
+      images: { icon:'🖼️', accept:'.png,.jpg,.jpeg,.webp,.bmp,.gif,.svg', hint:'PNG, JPG, WebP, BMP, GIF, SVG' },
+      documents: { icon:'📄', accept:'.pdf,.png,.jpg,.jpeg,.bmp,.webp,.txt', hint:'PDF, Images (PNG, JPG), TXT' },
+      media: { icon:'🎬', accept:'video/*,audio/*,.mp4,.webm,.avi,.mkv,.mov,.mp3,.wav,.ogg,.aac,.flac', hint:'MP4, WebM, AVI, MKV, MP3, WAV, OGG, AAC' },
+      tools: { icon:'🔧', accept:'image/*,.png,.jpg,.jpeg,.webp,.bmp,.gif', hint:'PNG, JPG, WebP, BMP, GIF' },
+    };
+
+    const FORMAT_OPTIONS = {
+      convert: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
+      resize: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
+      compress: [ {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'}, {v:'png',l:'PNG'} ],
+      crop: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
+      rotate: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
+      documents: [ {v:'images-to-pdf',l:'Images → PDF'}, {v:'merge-pdf',l:'Fusionner PDFs'}, {v:'split-pdf',l:'Extraire pages PDF'}, {v:'compress-pdf',l:'Compresser PDF'} ],
+      favicon: [ {v:'favicon-pack',l:'Pack Favicon (ZIP)'} ],
+      media: [ {v:'mp4',l:'MP4'}, {v:'webm',l:'WebM'}, {v:'gif',l:'GIF (animé)'}, {v:'mp3',l:'MP3'}, {v:'wav',l:'WAV'}, {v:'ogg',l:'OGG'} ],
+      removebg: [ {v:'png',l:'PNG (transparent)'} ],
+      exif: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
+    };
+
+    function updateUI() {
+      // Hide all special sections
+      ['qrSection','base64Section','colorPickerArea','cropArea','previewArea','statsBar','aboutSection','historySection','ffmpegNotice','batchRenamePanel','bgRemovalRow','txt2imgSection','asciiSection','presetsRow'].forEach(id => { const el=$('#'+id); if(el) el.classList.add('hidden'); });
+      $('#pdfPageRow').classList.add('hidden');
+      $('#resizeRow').classList.add('hidden');
+      $('#rotateRow').classList.add('hidden');
+
+      if (currentTab === 'about') {
+        $('#dropZone').classList.add('hidden');
+        $('#optionsPanel').classList.add('hidden');
+        $('#subTools').classList.add('hidden');
+        $('#aboutSection').classList.remove('hidden');
+        return;
+      }
+
+      const conf = TAB_CONFIG[currentTab] || TAB_CONFIG.images;
+      $('#fileInput').setAttribute('accept', conf.accept);
+      $('#dropIcon').textContent = conf.icon;
+      $('#formatsHint').textContent = conf.hint;
+
+      // Sub-tool specific UI
+      const isToolTab = currentTab === 'tools';
+      const needsDropZone = !(isToolTab && currentSubTool === 'qrcode');
+      const needsBase64 = isToolTab && currentSubTool === 'base64';
+
+      if (isToolTab && currentSubTool === 'qrcode') {
+        $('#dropZone').classList.add('hidden');
+        $('#qrSection').classList.remove('hidden');
+        $('#optionsPanel').classList.add('hidden');
+        return;
+      }
+      if (isToolTab && currentSubTool === 'txt2img') {
+        $('#dropZone').classList.add('hidden');
+        $('#txt2imgSection').classList.remove('hidden');
+        $('#optionsPanel').classList.add('hidden');
+        return;
+      }
+      if (isToolTab && currentSubTool === 'ascii') {
+        $('#asciiSection').classList.remove('hidden');
+        // Drop zone visible for image upload
+      }
+      if (needsBase64) {
+        $('#base64Section').classList.remove('hidden');
+        updateBase64Mode(); // This controls dropZone visibility for base64
+      } else {
+        $('#dropZone').classList.toggle('hidden', !needsDropZone);
+      }
+      if (isToolTab && currentSubTool === 'colorpicker') {
+        // Drop zone shown, color picker area will show after file upload
+      }
+
+      // Build format options
+      let formats;
+      if (currentTab === 'documents') formats = FORMAT_OPTIONS.documents;
+      else if (currentTab === 'media') formats = FORMAT_OPTIONS.media;
+      else if (isToolTab) formats = FORMAT_OPTIONS[currentSubTool] || FORMAT_OPTIONS.convert;
+      else formats = FORMAT_OPTIONS[currentSubTool] || FORMAT_OPTIONS.convert;
+
+      const sel = $('#outputFormat');
+      sel.innerHTML = '';
+      if (formats) {
+        formats.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.v; opt.textContent = f.l;
+          sel.appendChild(opt);
+        });
+      }
+
+      // Quality slider
+      const showQuality = ['convert','resize','compress','rotate','crop'].includes(currentSubTool) && currentTab === 'images';
+      $('#qualityGroup').classList.toggle('hidden', !showQuality);
+
+      // Resize row (only for resize, not compress)
+      if (currentSubTool === 'resize') {
+        $('#resizeRow').classList.remove('hidden');
+        $('#presetsRow').classList.remove('hidden');
+        buildPresets();
+      }
+
+      // Rotate row
+      if (currentSubTool === 'rotate') $('#rotateRow').classList.remove('hidden');
+
+      // PDF pages — show row if split-pdf is already selected
+      if (currentTab === 'documents' && sel.value === 'split-pdf') {
+        $('#pdfPageRow').classList.remove('hidden');
+      }
+
+      // BG removal
+      if (isToolTab && currentSubTool === 'removebg') $('#bgRemovalRow').classList.remove('hidden');
+
+      // Hide options panel for tools that don't use it
+      const noConvertTools = ['colorpicker', 'base64', 'qrcode', 'txt2img', 'ascii'];
+      if (isToolTab && noConvertTools.includes(currentSubTool)) {
+        $('#optionsPanel').classList.add('hidden');
+        return;
+      }
+
+      // Show options if files selected
+      if (selectedFiles.length > 0) {
+        $('#optionsPanel').classList.remove('hidden');
+        if (selectedFiles.length > 1) $('#batchRenamePanel').classList.remove('hidden');
+      } else {
+        $('#optionsPanel').classList.add('hidden');
+      }
+    }
+
+    // ======================== DRAG & DROP ========================
+    const dropZone = $('#dropZone');
+    const fileInput = $('#fileInput');
+    dropZone.addEventListener('click', () => { if(!dropZone.classList.contains('hidden')) fileInput.click(); });
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); addFiles(Array.from(e.dataTransfer.files)); });
+    fileInput.addEventListener('change', () => { addFiles(Array.from(fileInput.files)); fileInput.value=''; });
+
+    // ======================== FILE MANAGEMENT ========================
+    function addFiles(files) {
+      if(!files.length) return;
+      selectedFiles.push(...files);
+      renderFiles();
+      $('#optionsPanel').classList.remove('hidden');
+      if(selectedFiles.length > 1) $('#batchRenamePanel').classList.remove('hidden');
+      clearResults();
+
+      // Special: color picker auto-load
+      if(currentTab === 'tools' && currentSubTool === 'colorpicker') loadColorPicker(selectedFiles[0]);
+      // Special: crop auto-load
+      if(currentTab === 'images' && currentSubTool === 'crop') loadCropTool(selectedFiles[0]);
+      // Special: base64 auto-convert
+      if(currentTab === 'tools' && currentSubTool === 'base64' && $('#base64Mode').value === 'to') convertToBase64(selectedFiles[0]);
+    }
+
+    function removeFile(i) {
+      selectedFiles.splice(i,1);
+      renderFiles();
+      if(!selectedFiles.length) { $('#optionsPanel').classList.add('hidden'); $('#batchRenamePanel').classList.add('hidden'); }
+    }
+
+    function clearFiles() { selectedFiles=[]; $('#filesList').innerHTML=''; $('#optionsPanel').classList.add('hidden'); $('#batchRenamePanel').classList.add('hidden'); }
+    function clearResults() { convertedFiles=[]; $('#results').innerHTML=''; $('#progressSection').classList.add('hidden'); $('#previewArea').classList.add('hidden'); $('#statsBar').classList.add('hidden'); }
+
+    let thumbURLs = [];
+    let dragSrcIndex = null;
+    function renderFiles() {
+      const list = $('#filesList');
+      // Revoke old thumbnail URLs
+      thumbURLs.forEach(u => URL.revokeObjectURL(u));
+      thumbURLs = [];
+      list.innerHTML = '';
+      selectedFiles.forEach((file, i) => {
+        const card = document.createElement('div'); card.className='file-card';
+        card.setAttribute('draggable', 'true');
+        card.dataset.index = i;
+
+        // Drag handle
+        const handle = document.createElement('span'); handle.className='drag-handle'; handle.textContent='⠿';
+        const thumb = document.createElement('div'); thumb.className='file-thumb';
+        if(file.type.startsWith('image/')) { const img=document.createElement('img'); const url=URL.createObjectURL(file); thumbURLs.push(url); img.src=url; thumb.appendChild(img); }
+        else if(file.type.startsWith('video/')) thumb.textContent='🎬';
+        else if(file.type.startsWith('audio/')) thumb.textContent='🎵';
+        else if(file.type==='application/pdf') thumb.textContent='📄';
+        else thumb.textContent='📁';
+        const info = document.createElement('div'); info.className='file-info';
+        info.innerHTML=`<div class="file-name">${esc(file.name)}</div><div class="file-size">${fmtSize(file.size)}</div>`;
+        const rm = document.createElement('button'); rm.className='file-remove'; rm.textContent='✕'; rm.onclick=()=>removeFile(i);
+        card.append(handle,thumb,info,rm);
+
+        // Drag events for reordering
+        card.addEventListener('dragstart', (e) => {
+          dragSrcIndex = i;
+          card.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        card.addEventListener('dragend', () => { card.classList.remove('dragging'); });
+        card.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; card.classList.add('drag-over-card'); });
+        card.addEventListener('dragleave', () => { card.classList.remove('drag-over-card'); });
+        card.addEventListener('drop', (e) => {
+          e.preventDefault(); card.classList.remove('drag-over-card');
+          if (dragSrcIndex === null || dragSrcIndex === i) return;
+          const moved = selectedFiles.splice(dragSrcIndex, 1)[0];
+          selectedFiles.splice(i, 0, moved);
+          dragSrcIndex = null;
+          renderFiles();
+        });
+
+        list.appendChild(card);
+      });
+    }
+
+    // ======================== CONVERSION ENTRY ========================
+    $('#convertBtn').addEventListener('click', startConversion);
+
+    async function startConversion() {
+      if(!selectedFiles.length) { toast('Ajoutez des fichiers','warning'); return; }
+      const btn=$('#convertBtn');
+      btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Conversion...';
+      $('#progressSection').classList.remove('hidden');
+      $('#results').innerHTML=''; convertedFiles=[]; let totalInputSize=0, totalOutputSize=0;
+
+      try {
+        totalInputSize = selectedFiles.reduce((s,f)=>s+f.size,0);
+
+        if(currentTab==='images' && currentSubTool==='favicon') await generateFavicon();
+        else if(currentTab==='images') await processImages();
+        else if(currentTab==='documents') await processDocuments();
+        else if(currentTab==='media') await processMedia();
+        else if(currentTab==='tools') await processTools();
+
+        totalOutputSize = convertedFiles.reduce((s,f)=>s+f.blob.size,0);
+        showStats(totalInputSize, totalOutputSize);
+        showPreview();
+        renderResults();
+        addHistory(totalInputSize, totalOutputSize);
+        toast(`${convertedFiles.length} fichier(s) converti(s) !`,'success');
+        launchConfetti();
+        showInterstitialIfNeeded();
+      } catch(err) {
+        console.error(err);
+        toast('Erreur : '+err.message,'error');
+      }
+
+      btn.disabled=false; btn.innerHTML='⚡ <span data-i18n="convert">'+(LANGS[currentLang].convert||'Convertir')+'</span>';
+      $('#progressSection').classList.add('hidden');
+    }
+
+    // ======================== IMAGE PROCESSING ========================
+    async function processImages() {
+      const fmt = $('#outputFormat').value;
+      const quality = parseInt($('#qualitySlider').value)/100;
+      const mime = {png:'image/png',jpeg:'image/jpeg',webp:'image/webp'}[fmt];
+      const ext = {png:'png',jpeg:'jpg',webp:'webp'}[fmt];
+
+      for(let i=0;i<selectedFiles.length;i++) {
+        progress((i/selectedFiles.length)*100, `${i+1}/${selectedFiles.length}...`);
+        const file = selectedFiles[i];
+        let blob;
+
+        if(currentSubTool==='crop' && cropImg) {
+          // Crop only applies to the first image (the one loaded in crop tool)
+          if(i===0) {
+            blob = await getCroppedBlob(mime, quality);
+          } else {
+            blob = await imgToBlob(file, mime, quality);
+          }
+        } else if(currentSubTool==='rotate') {
+          blob = await rotateImage(file, mime, quality);
+        } else if(currentSubTool==='resize') {
+          blob = await resizeImage(file, mime, quality);
+        } else {
+          blob = await imgToBlob(file, mime, quality);
+        }
+
+        const name = applyBatchName(file.name, ext, i);
+        convertedFiles.push({name, blob});
+      }
+      progress(100,'Terminé !');
+    }
+
+    function imgToBlob(file, mime, quality, resizeW, resizeH) {
+      return new Promise((resolve,reject) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = resizeW || img.naturalWidth;
+          let h = resizeH || img.naturalHeight;
+          if(resizeW && !resizeH && $('#keepRatio').checked) h = Math.round(img.naturalHeight*(resizeW/img.naturalWidth));
+          if(resizeH && !resizeW && $('#keepRatio').checked) w = Math.round(img.naturalWidth*(resizeH/img.naturalHeight));
+          const c=document.createElement('canvas'); c.width=w; c.height=h;
+          const ctx=c.getContext('2d');
+          if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);}
+          ctx.drawImage(img,0,0,w,h);
+          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Conversion échouée'));},mime,quality);
+          URL.revokeObjectURL(img.src);
+        };
+        img.onerror=()=>reject(new Error('Fichier illisible'));
+        img.src=URL.createObjectURL(file);
+      });
+    }
+
+    async function resizeImage(file, mime, quality) {
+      const w = parseInt($('#resizeW').value) || undefined;
+      const h = parseInt($('#resizeH').value) || undefined;
+      return imgToBlob(file, mime, quality, w, h);
+    }
+
+    async function rotateImage(file, mime, quality) {
+      const angle = parseInt($('#rotateAngle').value);
+      const flip = $('#flipMode').value;
+      return new Promise((resolve,reject) => {
+        const img=new Image();
+        img.onload=()=>{
+          const rad=angle*Math.PI/180;
+          const swap=angle===90||angle===270;
+          const cw=swap?img.naturalHeight:img.naturalWidth;
+          const ch=swap?img.naturalWidth:img.naturalHeight;
+          const c=document.createElement('canvas'); c.width=cw; c.height=ch;
+          const ctx=c.getContext('2d');
+          if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,cw,ch);}
+          ctx.translate(cw/2,ch/2);
+          ctx.rotate(rad);
+          const sx=(flip==='h'||flip==='both')?-1:1;
+          const sy=(flip==='v'||flip==='both')?-1:1;
+          ctx.scale(sx,sy);
+          ctx.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
+          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Rotation échouée'));},mime,quality);
+          URL.revokeObjectURL(img.src);
+        };
+        img.onerror=()=>reject(new Error('Fichier illisible'));
+        img.src=URL.createObjectURL(file);
+      });
+    }
+
+    // ======================== CROP ========================
+    function loadCropTool(file) {
+      if(!file||!file.type.startsWith('image/')) return;
+      const canvas=$('#cropCanvas');
+      const container=$('#cropContainer');
+      const img=new Image();
+      img.onload=()=>{
+        cropImg=img;
+        const maxW=container.parentElement.clientWidth-40;
+        cropScale=Math.min(1, maxW/img.naturalWidth);
+        canvas.width=img.naturalWidth*cropScale;
+        canvas.height=img.naturalHeight*cropScale;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        $('#cropArea').classList.remove('hidden');
+        cropStartX=cropStartY=cropEndX=cropEndY=0;
+      };
+      img.src=URL.createObjectURL(file);
+    }
+
+    const cropCanvas=$('#cropCanvas');
+    cropCanvas.addEventListener('mousedown',e=>{
+      const r=cropCanvas.getBoundingClientRect();
+      cropStartX=e.clientX-r.left; cropStartY=e.clientY-r.top;
+      isCropping=true;
+    });
+    cropCanvas.addEventListener('mousemove',e=>{
+      if(!isCropping||!cropImg) return;
+      const r=cropCanvas.getBoundingClientRect();
+      cropEndX=e.clientX-r.left; cropEndY=e.clientY-r.top;
+      drawCropOverlay();
+    });
+    cropCanvas.addEventListener('mouseup',()=>{ isCropping=false; });
+    // Touch support
+    cropCanvas.addEventListener('touchstart',e=>{
+      const r=cropCanvas.getBoundingClientRect();
+      const t=e.touches[0];
+      cropStartX=t.clientX-r.left; cropStartY=t.clientY-r.top; isCropping=true;
+      e.preventDefault();
+    });
+    cropCanvas.addEventListener('touchmove',e=>{
+      if(!isCropping||!cropImg) return;
+      const r=cropCanvas.getBoundingClientRect();
+      const t=e.touches[0];
+      cropEndX=t.clientX-r.left; cropEndY=t.clientY-r.top;
+      drawCropOverlay(); e.preventDefault();
+    });
+    cropCanvas.addEventListener('touchend',()=>{ isCropping=false; });
+
+    function drawCropOverlay() {
+      if(!cropImg) return;
+      const c=cropCanvas, ctx=c.getContext('2d');
+      ctx.drawImage(cropImg,0,0,c.width,c.height);
+      const x=Math.min(cropStartX,cropEndX), y=Math.min(cropStartY,cropEndY);
+      const w=Math.abs(cropEndX-cropStartX), h=Math.abs(cropEndY-cropStartY);
+      ctx.fillStyle='rgba(0,0,0,0.5)';
+      ctx.fillRect(0,0,c.width,y);
+      ctx.fillRect(0,y+h,c.width,c.height-y-h);
+      ctx.fillRect(0,y,x,h);
+      ctx.fillRect(x+w,y,c.width-x-w,h);
+      ctx.strokeStyle='#667eea'; ctx.lineWidth=2; ctx.setLineDash([5,5]);
+      ctx.strokeRect(x,y,w,h);
+      ctx.setLineDash([]);
+      const rw=Math.round(w/cropScale), rh=Math.round(h/cropScale);
+      $('#cropInfo').textContent=`Sélection : ${rw} × ${rh} px`;
+    }
+
+    function getCroppedBlob(mime,quality) {
+      return new Promise((resolve,reject)=>{
+        if(!cropImg){reject(new Error('Pas de sélection'));return;}
+        const x=Math.min(cropStartX,cropEndX)/cropScale;
+        const y=Math.min(cropStartY,cropEndY)/cropScale;
+        const w=Math.abs(cropEndX-cropStartX)/cropScale;
+        const h=Math.abs(cropEndY-cropStartY)/cropScale;
+        if(w<2||h<2){reject(new Error('Sélection trop petite'));return;}
+        const c=document.createElement('canvas'); c.width=Math.round(w); c.height=Math.round(h);
+        const ctx=c.getContext('2d');
+        if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
+        ctx.drawImage(cropImg,x,y,w,h,0,0,c.width,c.height);
+        c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Crop échoué'));},mime,quality);
+      });
+    }
+
+    // ======================== DOCUMENTS ========================
+    async function processDocuments() {
+      const fmt=$('#outputFormat').value;
+      if(fmt==='images-to-pdf') await imagesToPdf();
+      else if(fmt==='merge-pdf') await mergePdfs();
+      else if(fmt==='split-pdf') await splitPdf();
+      else if(fmt==='compress-pdf') await compressPdf();
+    }
+
+    async function imagesToPdf() {
+      progress(10,'Création du PDF...');
+      const doc=await PDFLib.PDFDocument.create();
+      for(let i=0;i<selectedFiles.length;i++){
+        progress(10+(i/selectedFiles.length)*80,`Image ${i+1}/${selectedFiles.length}...`);
+        const f=selectedFiles[i]; const bytes=new Uint8Array(await f.arrayBuffer());
+        let img;
+        if(f.type==='image/png') img=await doc.embedPng(bytes);
+        else if(f.type==='image/jpeg') img=await doc.embedJpg(bytes);
+        else { const jpgBlob=await imgToBlob(f,'image/jpeg',0.92); img=await doc.embedJpg(new Uint8Array(await jpgBlob.arrayBuffer())); }
+        const p=doc.addPage([img.width,img.height]);
+        p.drawImage(img,{x:0,y:0,width:img.width,height:img.height});
+      }
+      const pdfBytes=await doc.save();
+      convertedFiles.push({name:'images-converties.pdf',blob:new Blob([pdfBytes],{type:'application/pdf'})});
+      progress(100,'Terminé !');
+    }
+
+    async function mergePdfs() {
+      progress(10,'Fusion...');
+      const merged=await PDFLib.PDFDocument.create();
+      for(let i=0;i<selectedFiles.length;i++){
+        progress(10+(i/selectedFiles.length)*80,`PDF ${i+1}/${selectedFiles.length}...`);
+        const f=selectedFiles[i]; if(f.type!=='application/pdf') continue;
+        const pdf=await PDFLib.PDFDocument.load(new Uint8Array(await f.arrayBuffer()));
+        (await merged.copyPages(pdf,pdf.getPageIndices())).forEach(p=>merged.addPage(p));
+      }
+      convertedFiles.push({name:'fusion.pdf',blob:new Blob([await merged.save()],{type:'application/pdf'})});
+      progress(100,'Terminé !');
+    }
+
+    async function splitPdf() {
+      if(!selectedFiles.length||selectedFiles[0].type!=='application/pdf') throw new Error('Sélectionnez un PDF');
+      progress(10,'Extraction...');
+      const src=await PDFLib.PDFDocument.load(new Uint8Array(await selectedFiles[0].arrayBuffer()));
+      const indices=parsePageRange($('#pdfPages').value.trim(),src.getPageCount());
+      const newDoc=await PDFLib.PDFDocument.create();
+      (await newDoc.copyPages(src,indices)).forEach(p=>newDoc.addPage(p));
+      const base=selectedFiles[0].name.replace('.pdf','');
+      convertedFiles.push({name:`${base}-extrait.pdf`,blob:new Blob([await newDoc.save()],{type:'application/pdf'})});
+      progress(100,'Terminé !');
+    }
+
+    function parsePageRange(str,total) {
+      if(!str) return Array.from({length:total},(_,i)=>i);
+      const s=new Set();
+      str.split(',').forEach(p=>{
+        p=p.trim();
+        if(p.includes('-')){const[a,b]=p.split('-').map(Number);for(let i=Math.max(1,a);i<=Math.min(total,b);i++)s.add(i-1);}
+        else{const n=parseInt(p);if(n>=1&&n<=total)s.add(n-1);}
+      });
+      return [...s].sort((a,b)=>a-b);
+    }
+
+    // ======================== MEDIA (FFmpeg) ========================
+    async function loadFFmpeg() {
+      if(ffmpegInstance) return ffmpegInstance;
+      if(ffmpegLoading){while(ffmpegLoading) await new Promise(r=>setTimeout(r,200));return ffmpegInstance;}
+      ffmpegLoading=true; $('#ffmpegNotice').classList.remove('hidden');
+      try {
+        const{FFmpeg}=await import('https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+        const{toBlobURL}=await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+        const ff=new FFmpeg();
+        ff.on('progress',({progress:p})=>{ const pct=Math.round(p*100); progress(pct,`Conversion : ${pct}%`); });
+        const base='https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
+        await ff.load({coreURL:await toBlobURL(`${base}/ffmpeg-core.js`,'text/javascript'),wasmURL:await toBlobURL(`${base}/ffmpeg-core.wasm`,'application/wasm')});
+        ffmpegInstance=ff;
+      } catch(e){throw new Error('Moteur vidéo indisponible. Hébergez ce fichier sur un serveur web. '+e.message);}
+      finally{ffmpegLoading=false;$('#ffmpegNotice').classList.add('hidden');}
+      return ffmpegInstance;
+    }
+
+    async function processMedia() {
+      const fmt=$('#outputFormat').value;
+      const ff=await loadFFmpeg();
+      const{fetchFile}=await import('https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js');
+      for(let i=0;i<selectedFiles.length;i++){
+        const f=selectedFiles[i]; progress(0,`Fichier ${i+1}/${selectedFiles.length}...`);
+        const ext=f.name.split('.').pop();
+        const inp=`in_${i}.${ext}`, out=`out_${i}.${fmt}`;
+        await ff.writeFile(inp,await fetchFile(f));
+        const args=['-i',inp];
+        if(fmt==='gif') args.push('-vf','fps=15,scale=480:-1:flags=lanczos','-loop','0');
+        else if(fmt==='mp3') args.push('-vn','-ab','192k');
+        else if(fmt==='wav') args.push('-vn');
+        else if(fmt==='ogg') args.push('-vn','-c:a','libvorbis','-q:a','5');
+        else if(fmt==='mp4') args.push('-c:v','libx264','-preset','fast','-crf','23');
+        else if(fmt==='webm') args.push('-c:v','libvpx','-b:v','1M','-c:a','libvorbis');
+        args.push(out); await ff.exec(args);
+        const data=await ff.readFile(out);
+        const mimes={mp4:'video/mp4',webm:'video/webm',gif:'image/gif',mp3:'audio/mpeg',wav:'audio/wav',ogg:'audio/ogg'};
+        const name=applyBatchName(f.name,fmt,i);
+        convertedFiles.push({name,blob:new Blob([data.buffer],{type:mimes[fmt]||'application/octet-stream'})});
+        await ff.deleteFile(inp); await ff.deleteFile(out);
+      }
+      progress(100,'Terminé !');
+    }
+
+    // ======================== TOOLS ========================
+    async function processTools() {
+      if(currentSubTool==='removebg') await removeBackground();
+      else if(currentSubTool==='exif') await removeExif();
+    }
+
+    async function removeBackground() {
+      const tol=parseInt($('#bgTolerance').value);
+      const mode=$('#bgColorMode').value;
+      for(let i=0;i<selectedFiles.length;i++){
+        progress((i/selectedFiles.length)*100,`${i+1}/${selectedFiles.length}...`);
+        const blob=await removeBgFromFile(selectedFiles[i],tol,mode);
+        const name=applyBatchName(selectedFiles[i].name,'png',i);
+        convertedFiles.push({name,blob});
+      }
+      progress(100,'Terminé !');
+    }
+
+    function removeBgFromFile(file,tolerance,mode) {
+      return new Promise((resolve,reject)=>{
+        const img=new Image();
+        img.onload=()=>{
+          const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+          const ctx=c.getContext('2d'); ctx.drawImage(img,0,0);
+          const data=ctx.getImageData(0,0,c.width,c.height);
+          const d=data.data;
+          let bgR,bgG,bgB;
+          if(mode==='white'){bgR=bgG=bgB=255;}
+          else if(mode==='black'){bgR=bgG=bgB=0;}
+          else if(mode==='green'){bgR=0;bgG=255;bgB=0;}
+          else{bgR=d[0];bgG=d[1];bgB=d[2];} // auto: top-left corner
+          for(let j=0;j<d.length;j+=4){
+            const dist=Math.sqrt((d[j]-bgR)**2+(d[j+1]-bgG)**2+(d[j+2]-bgB)**2);
+            if(dist<tolerance*2.55) d[j+3]=0;
+          }
+          ctx.putImageData(data,0,0);
+          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Erreur suppression fond'));},'image/png');
+          URL.revokeObjectURL(img.src);
+        };
+        img.onerror=()=>reject(new Error('Fichier illisible'));
+        img.src=URL.createObjectURL(file);
+      });
+    }
+
+    async function removeExif() {
+      const fmt=$('#outputFormat').value;
+      const mime={png:'image/png',jpeg:'image/jpeg',webp:'image/webp'}[fmt];
+      const ext={png:'png',jpeg:'jpg',webp:'webp'}[fmt];
+      for(let i=0;i<selectedFiles.length;i++){
+        progress((i/selectedFiles.length)*100,`${i+1}/${selectedFiles.length}...`);
+        const blob=await imgToBlob(selectedFiles[i],mime,0.95);
+        const name=applyBatchName(selectedFiles[i].name,ext,i);
+        convertedFiles.push({name,blob});
+      }
+      progress(100,'EXIF supprimé !');
+    }
+
+    // ======================== QR CODE ========================
+    $('#qrBtn').addEventListener('click', async()=>{
+      const text=$('#qrInput').value.trim();
+      if(!text){toast('Entrez un contenu','warning');return;}
+      const size=parseInt($('#qrSize').value)||300;
+      const color=$('#qrColor').value||'#000000';
+      const bg=$('#qrBg').value||'#ffffff';
+      const out=$('#qrOutput');
+      out.innerHTML=''; out.classList.remove('hidden');
+      try {
+        const canvas=document.createElement('canvas');
+        await QRCode.toCanvas(canvas,text,{width:size,color:{dark:color,light:bg},margin:2});
+        out.appendChild(canvas);
+        const dlBtn=document.createElement('button');
+        dlBtn.className='convert-btn'; dlBtn.style.maxWidth='300px'; dlBtn.style.margin='16px auto 0';
+        dlBtn.textContent='⬇ Télécharger QR Code';
+        dlBtn.onclick=()=>{
+          canvas.toBlob(b=>{if(b)downloadFile('qrcode.png',b);},'image/png');
+        };
+        out.appendChild(dlBtn);
+        addHistory(text.length, size*size*4, 'QR Code');
+        toast('QR Code généré !','success');
+      } catch(e){toast('Erreur : '+e.message,'error');}
+    });
+
+    // ======================== COLOR PICKER ========================
+    function loadColorPicker(file) {
+      if(!file||!file.type.startsWith('image/')) return;
+      const canvas=$('#colorCanvas');
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=$('#colorPickerArea').parentElement.clientWidth-48;
+        const scale=Math.min(1,maxW/img.naturalWidth);
+        canvas.width=img.naturalWidth*scale; canvas.height=img.naturalHeight*scale;
+        canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+        $('#colorPickerArea').classList.remove('hidden');
+        extractPalette(img);
+      };
+      img.src=URL.createObjectURL(file);
+    }
+
+    $('#colorCanvas').addEventListener('click',e=>{
+      const r=$('#colorCanvas').getBoundingClientRect();
+      const x=e.clientX-r.left, y=e.clientY-r.top;
+      const ctx=$('#colorCanvas').getContext('2d');
+      const p=ctx.getImageData(x,y,1,1).data;
+      showColorResult(p[0],p[1],p[2]);
+    });
+
+    function showColorResult(r,g,b) {
+      const hex='#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+      const hsl=rgbToHsl(r,g,b);
+      $('#colorSwatch').style.background=hex;
+      $('#colorValues').innerHTML=`
+        <div class="cv"><span>HEX</span><code onclick="copyText('${hex}')">${hex}</code></div>
+        <div class="cv"><span>RGB</span><code onclick="copyText('rgb(${r},${g},${b})')">rgb(${r}, ${g}, ${b})</code></div>
+        <div class="cv"><span>HSL</span><code onclick="copyText('hsl(${hsl})')">hsl(${hsl})</code></div>
+      `;
+      $('#colorResult').classList.remove('hidden');
+    }
+
+    function extractPalette(img) {
+      const c=document.createElement('canvas');
+      c.width=50; c.height=50; // small sample
+      c.getContext('2d').drawImage(img,0,0,50,50);
+      const data=c.getContext('2d').getImageData(0,0,50,50).data;
+      const colors=new Map();
+      for(let i=0;i<data.length;i+=16){ // sample every 4th pixel
+        const key=`${Math.round(data[i]/16)*16},${Math.round(data[i+1]/16)*16},${Math.round(data[i+2]/16)*16}`;
+        colors.set(key,(colors.get(key)||0)+1);
+      }
+      const sorted=[...colors.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8);
+      const pal=$('#colorPalette'); pal.innerHTML='';
+      sorted.forEach(([key])=>{
+        const[r,g,b]=key.split(',').map(Number);
+        const div=document.createElement('div'); div.className='palette-color';
+        div.style.background=`rgb(${r},${g},${b})`;
+        div.title=`rgb(${r},${g},${b})`;
+        div.onclick=()=>showColorResult(r,g,b);
+        pal.appendChild(div);
+      });
+      $('#paletteArea').classList.remove('hidden');
+    }
+
+    function rgbToHsl(r,g,b) {
+      r/=255;g/=255;b/=255;
+      const max=Math.max(r,g,b),min=Math.min(r,g,b);
+      let h,s,l=(max+min)/2;
+      if(max===min){h=s=0;}else{
+        const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min);
+        if(max===r)h=((g-b)/d+(g<b?6:0))/6;
+        else if(max===g)h=((b-r)/d+2)/6;
+        else h=((r-g)/d+4)/6;
+      }
+      return `${Math.round(h*360)}, ${Math.round(s*100)}%, ${Math.round(l*100)}%`;
+    }
+
+    // ======================== BASE64 ========================
+    function updateBase64Mode() {
+      const mode=$('#base64Mode').value;
+      const needsDrop=mode==='to';
+      $('#dropZone').classList.toggle('hidden',!needsDrop);
+      $('#base64InputArea').classList.toggle('hidden',needsDrop);
+      $('#base64Output').classList.add('hidden');
+    }
+    $('#base64Mode').addEventListener('change', updateBase64Mode);
+
+    function convertToBase64(file) {
+      if(!file) return;
+      const reader=new FileReader();
+      reader.onload=()=>{
+        $('#base64Result').value=reader.result;
+        $('#base64Output').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    $('#base64CopyBtn').addEventListener('click',()=>{
+      navigator.clipboard.writeText($('#base64Result').value).then(()=>toast('Copié !','success'));
+    });
+
+    $('#base64DecodeBtn').addEventListener('click',()=>{
+      const val=$('#base64Input').value.trim();
+      if(!val){toast('Collez du Base64','warning');return;}
+      try {
+        let src=val;
+        if(!val.startsWith('data:')) src='data:image/png;base64,'+val;
+        const blob=dataURLtoBlob(src);
+        downloadFile('decoded-image.png',blob);
+        toast('Image décodée !','success');
+      } catch(e){toast('Base64 invalide','error');}
+    });
+
+    function dataURLtoBlob(dataURL) {
+      const[header,data]=dataURL.split(',');
+      const mime=header.match(/:(.*?);/)[1];
+      const binary=atob(data);
+      const arr=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
+      return new Blob([arr],{type:mime});
+    }
+
+    // ======================== PREVIEW BEFORE/AFTER ========================
+    let previewURLs = [];
+    function showPreview() {
+      if(currentTab!=='images'&&!(currentTab==='tools'&&(currentSubTool==='removebg'||currentSubTool==='exif'))) return;
+      if(!selectedFiles.length||!convertedFiles.length) return;
+      const orig=selectedFiles[0], conv=convertedFiles[0];
+      if(!orig.type.startsWith('image/')&&!conv.blob.type.startsWith('image/')) return;
+      // Revoke old preview URLs
+      previewURLs.forEach(u => URL.revokeObjectURL(u));
+      previewURLs = [];
+      const urlBefore=URL.createObjectURL(orig);
+      const urlAfter=URL.createObjectURL(conv.blob);
+      previewURLs.push(urlBefore, urlAfter);
+      $('#previewBefore').src=urlBefore;
+      $('#previewAfter').src=urlAfter;
+      $('#previewSizeBefore').textContent=fmtSize(orig.size);
+      $('#previewSizeAfter').textContent=fmtSize(conv.blob.size);
+      $('#previewArea').classList.remove('hidden');
+    }
+    $('#closePreview').addEventListener('click',()=>$('#previewArea').classList.add('hidden'));
+
+    // ======================== STATS ========================
+    function showStats(inputSize, outputSize) {
+      if(!inputSize) return;
+      const ratio=((1-outputSize/inputSize)*100).toFixed(1);
+      const bar=$('#statsBar'); bar.innerHTML=''; bar.classList.remove('hidden');
+      const items=[
+        {label:currentLang==='en'?'Input':'Entrée', value:fmtSize(inputSize), cls:''},
+        {label:currentLang==='en'?'Output':'Sortie', value:fmtSize(outputSize), cls:''},
+        {label:currentLang==='en'?'Reduction':'Réduction', value:(ratio>0?'-':'+')+ Math.abs(ratio)+'%', cls:ratio>0?'green':'red'},
+      ];
+      items.forEach(it=>{
+        const card=document.createElement('div'); card.className='stat-card'+(it.cls?' '+it.cls:'');
+        card.innerHTML=`<div class="stat-value">${it.value}</div><div class="stat-label">${it.label}</div>`;
+        bar.appendChild(card);
+      });
+    }
+
+    // ======================== RESULTS ========================
+    function renderResults() {
+      const res=$('#results'); res.innerHTML='';
+      convertedFiles.forEach((f,i)=>{
+        const card=document.createElement('div'); card.className='result-card';
+        card.innerHTML=`<div class="result-icon">✓</div><div class="result-info"><div class="result-name">${esc(f.name)}</div><div class="result-size">${fmtSize(f.blob.size)}</div></div>`;
+        const dl=document.createElement('button'); dl.className='result-download'; dl.textContent='⬇'; dl.onclick=()=>downloadFile(f.name,f.blob);
+        card.appendChild(dl); res.appendChild(card);
+      });
+      if(convertedFiles.length>1){
+        const btn=document.createElement('button'); btn.className='download-all-btn'; btn.innerHTML='📦 Tout télécharger (ZIP)';
+        btn.onclick=downloadAllZip; res.appendChild(btn);
+      }
+    }
+
+    function downloadFile(name,blob) {
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=name;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    }
+
+    async function downloadAllZip() {
+      const zip=new JSZip();
+      convertedFiles.forEach(f=>zip.file(f.name,f.blob));
+      downloadFile('convertall.zip',await zip.generateAsync({type:'blob'}));
+    }
+
+    // ======================== BATCH RENAME ========================
+    function applyBatchName(originalName, ext, index) {
+      const pattern=$('#batchPattern')?.value||'{name}.{ext}';
+      const baseName=originalName.replace(/\.[^.]+$/,'');
+      return pattern.replace('{name}',baseName).replace('{ext}',ext).replace('{index}',String(index+1).padStart(2,'0'));
+    }
+
+    // ======================== HISTORY ========================
+    function getHistory() { try{return JSON.parse(localStorage.getItem('convertall-history')||'[]');}catch{return[];} }
+    function saveHistory(h) { localStorage.setItem('convertall-history',JSON.stringify(h.slice(-50))); }
+
+    function addHistory(inputSize,outputSize,customType) {
+      const h=getHistory();
+      h.push({
+        date:new Date().toISOString(),
+        type:customType||currentTab+'/'+currentSubTool,
+        files:selectedFiles.length,
+        inputSize, outputSize,
+      });
+      saveHistory(h);
+    }
+
+    function showHistory() {
+      const section=$('#historySection');
+      const visible=!section.classList.contains('hidden');
+      // Hide everything else
+      if(!visible) {
+        section.classList.remove('hidden');
+        renderHistory();
+      } else {
+        section.classList.add('hidden');
+      }
+    }
+
+    function renderHistory() {
+      const list=$('#historyList'); list.innerHTML='';
+      const h=getHistory().reverse();
+      if(!h.length){list.innerHTML='<p style="color:var(--text-muted);font-size:.84rem">'+(currentLang==='en'?'No history yet':'Aucun historique')+'</p>';return;}
+      h.forEach(item=>{
+        const d=new Date(item.date);
+        const div=document.createElement('div'); div.className='history-item';
+        div.innerHTML=`
+          <span class="hi-icon">${item.type.includes('image')?'🖼️':item.type.includes('doc')?'📄':item.type.includes('media')?'🎬':'🔧'}</span>
+          <div class="hi-info">
+            <div class="hi-detail">${esc(item.type)} — ${item.files} fichier(s)</div>
+            <div class="hi-sizes">${fmtSize(item.inputSize)} → ${fmtSize(item.outputSize)}</div>
+          </div>
+          <div class="hi-date">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    $('#historyBtn').addEventListener('click', showHistory);
+    $('#historyClear').addEventListener('click',()=>{ localStorage.removeItem('convertall-history'); renderHistory(); toast(currentLang==='en'?'History cleared':'Historique vidé','success'); });
+
+    // ======================== FORMAT CHANGE (PDF pages) ========================
+    $('#outputFormat').addEventListener('change', () => {
+      if (currentTab === 'documents') {
+        $('#pdfPageRow').classList.toggle('hidden', $('#outputFormat').value !== 'split-pdf');
+      }
+    });
+
+    // ======================== QUALITY SLIDER ========================
+    $('#qualitySlider').addEventListener('input',()=>{ $('#qualityValue').textContent=$('#qualitySlider').value+'%'; });
+    $('#bgTolerance').addEventListener('input',()=>{ $('#bgToleranceValue').textContent=$('#bgTolerance').value; });
+
+    // ======================== HELPERS ========================
+    function progress(pct,text) { $('#progressFill').style.width=pct+'%'; $('#progressText').textContent=text; }
+    function toast(msg,type='info') {
+      const t=document.createElement('div'); t.className='toast '+type;
+      const icons={success:'✓',error:'✕',warning:'⚠',info:'ℹ'};
+      t.innerHTML=`<span>${icons[type]||''}</span> ${esc(msg)}`;
+      $('#toastContainer').appendChild(t); setTimeout(()=>t.remove(),3000);
+    }
+    function fmtSize(b) { if(b<1024)return b+' o'; if(b<1048576)return(b/1024).toFixed(1)+' Ko'; return(b/1048576).toFixed(2)+' Mo'; }
+    function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    function copyText(t) { navigator.clipboard.writeText(t).then(()=>toast('Copié !','success')); }
+
+    // ======================== COOKIE BANNER RGPD ========================
+    function initCookieBanner() {
+      if (!localStorage.getItem('convertall-cookies')) {
+        $('#cookieBanner').classList.remove('hidden');
+      }
+    }
+    $('#cookieAccept').addEventListener('click', () => {
+      localStorage.setItem('convertall-cookies', 'accepted');
+      $('#cookieBanner').classList.add('hidden');
+    });
+    $('#cookieDecline').addEventListener('click', () => {
+      localStorage.setItem('convertall-cookies', 'declined');
+      $('#cookieBanner').classList.add('hidden');
+    });
+
+    // ======================== CTRL+V PASTE ========================
+    document.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files = [];
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) files.push(file);
+        }
+      }
+      if (files.length) {
+        e.preventDefault();
+        addFiles(files);
+        toast(currentLang === 'en' ? 'Image pasted!' : 'Image collée !', 'success');
+      }
+    });
+
+    // ======================== CONFETTI ========================
+    function launchConfetti() {
+      const canvas = document.createElement('canvas');
+      canvas.className = 'confetti-canvas';
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const particles = [];
+      const colors = ['#667eea', '#764ba2', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#ec4899', '#14b8a6'];
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 16,
+          vy: Math.random() * -18 - 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 8 + 3,
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 12,
+          gravity: 0.3 + Math.random() * 0.2,
+          opacity: 1,
+        });
+      }
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.vy += p.gravity;
+          p.y += p.vy;
+          p.rotation += p.rotSpeed;
+          p.opacity -= 0.008;
+          if (p.opacity <= 0) return;
+          alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation * Math.PI / 180);
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        });
+        frame++;
+        if (alive && frame < 180) requestAnimationFrame(animate);
+        else canvas.remove();
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // ======================== INTERSTITIAL AD ========================
+    let conversionCount = parseInt(sessionStorage.getItem('convertall-convcount') || '0');
+
+    function showInterstitialIfNeeded() {
+      conversionCount++;
+      sessionStorage.setItem('convertall-convcount', String(conversionCount));
+      if (conversionCount % 2 === 0) {
+        showInterstitial();
+      }
+    }
+
+    function showInterstitial() {
+      const overlay = $('#interstitialOverlay');
+      const timer = $('#interstitialTimer');
+      const closeBtn = $('#interstitialClose');
+      overlay.classList.remove('hidden');
+      closeBtn.classList.remove('active');
+      let sec = 5;
+      timer.textContent = (currentLang === 'en' ? 'Closing in ' : 'Fermeture dans ') + sec + 's...';
+      const interval = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+          clearInterval(interval);
+          timer.textContent = '';
+          closeBtn.classList.add('active');
+        } else {
+          timer.textContent = (currentLang === 'en' ? 'Closing in ' : 'Fermeture dans ') + sec + 's...';
+        }
+      }, 1000);
+    }
+
+    $('#interstitialClose').addEventListener('click', () => {
+      if ($('#interstitialClose').classList.contains('active')) {
+        $('#interstitialOverlay').classList.add('hidden');
+      }
+    });
+
+    // ======================== RESIZE PRESETS ========================
+    const RESIZE_PRESETS = [
+      { label: 'Instagram Post', w: 1080, h: 1080 },
+      { label: 'Instagram Story', w: 1080, h: 1920 },
+      { label: 'YouTube Thumb', w: 1280, h: 720 },
+      { label: 'Twitter Post', w: 1200, h: 675 },
+      { label: 'Facebook Cover', w: 820, h: 312 },
+      { label: 'HD 720p', w: 1280, h: 720 },
+      { label: 'Full HD', w: 1920, h: 1080 },
+      { label: '4K', w: 3840, h: 2160 },
+      { label: 'iPhone', w: 1170, h: 2532 },
+      { label: 'Favicon 32', w: 32, h: 32 },
+      { label: 'Avatar 256', w: 256, h: 256 },
+    ];
+
+    function buildPresets() {
+      const cont = $('#presetsContainer');
+      if (!cont) return;
+      cont.innerHTML = '';
+      RESIZE_PRESETS.forEach(p => {
+        const chip = document.createElement('button');
+        chip.className = 'preset-chip';
+        chip.textContent = `${p.label} (${p.w}×${p.h})`;
+        chip.addEventListener('click', () => {
+          $('#resizeW').value = p.w;
+          $('#resizeH').value = p.h;
+        });
+        cont.appendChild(chip);
+      });
+    }
+
+    // ======================== PDF COMPRESSOR ========================
+    async function compressPdf() {
+      if (!selectedFiles.length || selectedFiles[0].type !== 'application/pdf') throw new Error('Sélectionnez un PDF');
+      progress(20, 'Compression du PDF...');
+      const src = await PDFLib.PDFDocument.load(new Uint8Array(await selectedFiles[0].arrayBuffer()), { ignoreEncryption: true });
+      // Re-save the PDF (pdf-lib strips some metadata and optimizes)
+      const newDoc = await PDFLib.PDFDocument.create();
+      const pages = await newDoc.copyPages(src, src.getPageIndices());
+      pages.forEach(p => newDoc.addPage(p));
+      // Remove metadata
+      newDoc.setTitle(''); newDoc.setAuthor(''); newDoc.setSubject('');
+      newDoc.setKeywords([]); newDoc.setProducer('ConvertAll'); newDoc.setCreator('ConvertAll');
+      const pdfBytes = await newDoc.save();
+      const base = selectedFiles[0].name.replace('.pdf', '');
+      convertedFiles.push({ name: `${base}-compressed.pdf`, blob: new Blob([pdfBytes], { type: 'application/pdf' }) });
+      progress(100, 'Terminé !');
+    }
+
+    // ======================== TEXT TO IMAGE ========================
+    $('#txt2imgBtn').addEventListener('click', () => {
+      const text = $('#txt2imgInput').value;
+      if (!text.trim()) { toast(currentLang === 'en' ? 'Enter text' : 'Entrez du texte', 'warning'); return; }
+      const fontSize = parseInt($('#txt2imgFontSize').value) || 32;
+      const color = $('#txt2imgColor').value || '#ffffff';
+      const bg = $('#txt2imgBg').value || '#1a1a2e';
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = `${fontSize}px 'Segoe UI', sans-serif`;
+
+      const lines = text.split('\n');
+      const lineMetrics = lines.map(l => ctx.measureText(l));
+      const maxWidth = Math.max(...lineMetrics.map(m => m.width));
+      const lineHeight = fontSize * 1.4;
+      const padding = fontSize;
+
+      canvas.width = Math.ceil(maxWidth + padding * 2);
+      canvas.height = Math.ceil(lines.length * lineHeight + padding * 2);
+
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = `${fontSize}px 'Segoe UI', sans-serif`;
+      ctx.fillStyle = color;
+      ctx.textBaseline = 'top';
+
+      lines.forEach((line, i) => {
+        ctx.fillText(line, padding, padding + i * lineHeight);
+      });
+
+      const preview = $('#txt2imgPreview');
+      preview.innerHTML = '';
+      preview.classList.remove('hidden');
+      const previewCanvas = canvas.cloneNode();
+      previewCanvas.getContext('2d').drawImage(canvas, 0, 0);
+      preview.appendChild(previewCanvas);
+
+      const dlBtn = document.createElement('button');
+      dlBtn.className = 'convert-btn'; dlBtn.style.maxWidth = '300px'; dlBtn.style.margin = '16px auto 0';
+      dlBtn.textContent = '⬇ ' + (currentLang === 'en' ? 'Download image' : 'Télécharger l\'image');
+      dlBtn.onclick = () => {
+        canvas.toBlob(b => { if (b) downloadFile('text-image.png', b); }, 'image/png');
+      };
+      preview.appendChild(dlBtn);
+      toast(currentLang === 'en' ? 'Image generated!' : 'Image générée !', 'success');
+    });
+
+    // ======================== FAVICON GENERATOR ========================
+    async function generateFavicon() {
+      if (!selectedFiles.length) { toast(currentLang === 'en' ? 'Add an image' : 'Ajoutez une image', 'warning'); return; }
+      progress(10, 'Génération du pack favicon...');
+      const sizes = [16, 32, 48, 64, 128, 180, 192, 512];
+      const zip = new JSZip();
+
+      const img = await loadImage(selectedFiles[0]);
+      for (let i = 0; i < sizes.length; i++) {
+        const size = sizes[i];
+        progress(10 + (i / sizes.length) * 80, `Favicon ${size}×${size}...`);
+        const canvas = document.createElement('canvas');
+        canvas.width = size; canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        zip.file(`favicon-${size}x${size}.png`, blob);
+      }
+
+      // Generate ICO-like (just 32x32 PNG named favicon.ico for simplicity)
+      const icoCanvas = document.createElement('canvas');
+      icoCanvas.width = 32; icoCanvas.height = 32;
+      icoCanvas.getContext('2d').drawImage(img, 0, 0, 32, 32);
+      const icoBlob = await new Promise(r => icoCanvas.toBlob(r, 'image/png'));
+      zip.file('favicon.ico', icoBlob);
+
+      // Generate HTML snippet
+      zip.file('usage.html', `<!-- Collez dans votre <head> -->\n<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">\n<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">\n<link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">`);
+
+      URL.revokeObjectURL(img.src);
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      convertedFiles.push({ name: 'favicon-pack.zip', blob: zipBlob });
+      progress(100, 'Terminé !');
+    }
+
+    function loadImage(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Fichier illisible'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    // ======================== ASCII ART GENERATOR ========================
+    function generateAsciiArt(file, width) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const ratio = img.naturalHeight / img.naturalWidth;
+          const h = Math.round(width * ratio * 0.5); // chars are taller than wide
+          const canvas = document.createElement('canvas');
+          canvas.width = width; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, h);
+          const data = ctx.getImageData(0, 0, width, h).data;
+          const chars = ' .:-=+*#%@';
+          let ascii = '';
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < width; x++) {
+              const i = (y * width + x) * 4;
+              const brightness = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+              const charIdx = Math.floor((1 - brightness) * (chars.length - 1));
+              ascii += chars[charIdx];
+            }
+            ascii += '\n';
+          }
+          URL.revokeObjectURL(img.src);
+          resolve(ascii);
+        };
+        img.onerror = () => reject(new Error('Fichier illisible'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    $('#asciiBtn').addEventListener('click', async () => {
+      if (!selectedFiles.length) { toast(currentLang === 'en' ? 'Add an image' : 'Ajoutez une image', 'warning'); return; }
+      const width = parseInt($('#asciiWidth').value) || 100;
+      try {
+        const ascii = await generateAsciiArt(selectedFiles[0], width);
+        $('#asciiResult').textContent = ascii;
+        $('#asciiOutput').classList.remove('hidden');
+        toast(currentLang === 'en' ? 'ASCII art generated!' : 'ASCII art généré !', 'success');
+      } catch (e) {
+        toast('Erreur : ' + e.message, 'error');
+      }
+    });
+
+    $('#asciiCopyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText($('#asciiResult').textContent).then(() => toast('Copié !', 'success'));
+    });
+
+    $('#asciiDownloadBtn').addEventListener('click', () => {
+      const text = $('#asciiResult').textContent;
+      downloadFile('ascii-art.txt', new Blob([text], { type: 'text/plain' }));
+    });
+
+    // ======================== INIT ========================
+    initTheme();
+    initCookieBanner();
+    buildSubTools();
+    updateUI();
+    applyLang();
+  </script>
+</body>
+</html>
