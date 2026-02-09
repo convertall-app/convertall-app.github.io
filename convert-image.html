@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" data-theme="dark" data-lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ConvertAll — Convertisseur de Fichiers Gratuit</title>
-  <meta name="description" content="Convertisseur de fichiers gratuit en ligne : images, PDF, vidéo, audio, QR Code. 100% privé, tout reste sur votre appareil.">
+  <title>Convertir Image PNG JPG WebP Gratuit | ConvertAll</title>
+  <meta name="description" content="Convertissez vos images entre PNG, JPG et WebP gratuitement en ligne. 100% privÃ©, aucun upload.">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3295055468386254" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -315,7 +315,7 @@
     }
   </style>
 </head>
-<body>
+<body data-auto-tab="images" data-auto-tool="convert">
   <div class="app">
     <header>
       <div class="logo">
@@ -327,17 +327,17 @@
       </div>
       <div class="header-actions">
         <button class="header-btn lang-btn" id="langBtn" title="Language">FR</button>
-        <button class="header-btn" id="historyBtn" title="Historique">📋</button>
-        <button class="header-btn" id="themeToggle" title="Thème">🌙</button>
+        <button class="header-btn" id="historyBtn" title="Historique">ðŸ“‹</button>
+        <button class="header-btn" id="themeToggle" title="ThÃ¨me">ðŸŒ™</button>
       </div>
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="images"><span class="tab-icon">🖼️</span> <span data-i18n="tab_images">Images</span></button>
-      <button class="tab" data-tab="documents"><span class="tab-icon">📄</span> <span data-i18n="tab_docs">Documents</span></button>
-      <button class="tab" data-tab="media"><span class="tab-icon">🎬</span> <span data-i18n="tab_media">Vidéo/Audio</span></button>
-      <button class="tab" data-tab="tools"><span class="tab-icon">🔧</span> <span data-i18n="tab_tools">Outils</span></button>
-      <button class="tab" data-tab="about"><span class="tab-icon">ℹ️</span> <span data-i18n="tab_about">À propos</span></button>
+      <button class="tab active" data-tab="images"><span class="tab-icon">ðŸ–¼ï¸</span> <span data-i18n="tab_images">Images</span></button>
+      <button class="tab" data-tab="documents"><span class="tab-icon">ðŸ“„</span> <span data-i18n="tab_docs">Documents</span></button>
+      <button class="tab" data-tab="media"><span class="tab-icon">ðŸŽ¬</span> <span data-i18n="tab_media">VidÃ©o/Audio</span></button>
+      <button class="tab" data-tab="tools"><span class="tab-icon">ðŸ”§</span> <span data-i18n="tab_tools">Outils</span></button>
+      <button class="tab" data-tab="about"><span class="tab-icon">â„¹ï¸</span> <span data-i18n="tab_about">Ã€ propos</span></button>
     </nav>
 
     <main>
@@ -352,9 +352,9 @@
 
       <!-- DROP ZONE -->
       <div class="drop-zone" id="dropZone">
-        <div class="drop-icon" id="dropIcon">🖼️</div>
+        <div class="drop-icon" id="dropIcon">ðŸ–¼ï¸</div>
         <h3 data-i18n="drop_title">Glissez vos fichiers ici</h3>
-        <p data-i18n="drop_sub">ou cliquez pour sélectionner</p>
+        <p data-i18n="drop_sub">ou cliquez pour sÃ©lectionner</p>
         <p class="formats-hint" id="formatsHint">PNG, JPG, WebP, BMP, GIF, SVG</p>
         <input type="file" id="fileInput" multiple hidden>
       </div>
@@ -365,9 +365,9 @@
       <!-- BATCH RENAME -->
       <div class="options-panel hidden" id="batchRenamePanel">
         <div class="option-group">
-          <label data-i18n="batch_pattern">Modèle de renommage</label>
+          <label data-i18n="batch_pattern">ModÃ¨le de renommage</label>
           <input type="text" id="batchPattern" placeholder="{name}_{index}.{ext}" value="{name}.{ext}">
-          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px" data-i18n="batch_help">{name} = nom original, {index} = numéro, {ext} = extension de sortie</div>
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px" data-i18n="batch_help">{name} = nom original, {index} = numÃ©ro, {ext} = extension de sortie</div>
         </div>
       </div>
 
@@ -380,7 +380,7 @@
             <select id="outputFormat"></select>
           </div>
           <div class="option-group" id="qualityGroup">
-            <label data-i18n="quality">Qualité</label>
+            <label data-i18n="quality">QualitÃ©</label>
             <div class="quality-display">
               <input type="range" id="qualitySlider" min="10" max="100" value="90" step="5">
               <span class="quality-value" id="qualityValue">90%</span>
@@ -417,18 +417,18 @@
           <div class="option-group">
             <label data-i18n="rotation">Rotation</label>
             <select id="rotateAngle">
-              <option value="0">0°</option>
-              <option value="90">90° →</option>
-              <option value="180">180°</option>
-              <option value="270">270° ←</option>
+              <option value="0">0Â°</option>
+              <option value="90">90Â° â†’</option>
+              <option value="180">180Â°</option>
+              <option value="270">270Â° â†</option>
             </select>
           </div>
           <div class="option-group">
             <label data-i18n="flip">Miroir</label>
             <select id="flipMode">
               <option value="none">Aucun</option>
-              <option value="h">Horizontal ↔</option>
-              <option value="v">Vertical ↕</option>
+              <option value="h">Horizontal â†”</option>
+              <option value="v">Vertical â†•</option>
               <option value="both">Les deux</option>
             </select>
           </div>
@@ -445,14 +445,14 @@
         <!-- BG removal tolerance -->
         <div class="options-row hidden" id="bgRemovalRow" style="margin-top:12px">
           <div class="option-group">
-            <label data-i18n="tolerance">Tolérance</label>
+            <label data-i18n="tolerance">TolÃ©rance</label>
             <div class="quality-display">
               <input type="range" id="bgTolerance" min="0" max="100" value="30" step="1">
               <span class="quality-value" id="bgToleranceValue">30</span>
             </div>
           </div>
           <div class="option-group">
-            <label data-i18n="bg_color">Couleur de fond à supprimer</label>
+            <label data-i18n="bg_color">Couleur de fond Ã  supprimer</label>
             <select id="bgColorMode">
               <option value="auto">Auto (coins)</option>
               <option value="white">Blanc</option>
@@ -462,7 +462,7 @@
           </div>
         </div>
 
-        <button class="convert-btn" id="convertBtn">⚡ <span data-i18n="convert">Convertir</span></button>
+        <button class="convert-btn" id="convertBtn">âš¡ <span data-i18n="convert">Convertir</span></button>
       </div>
 
       <!-- QR CODE SECTION -->
@@ -486,7 +486,7 @@
               <input type="text" id="qrBg" value="#ffffff" placeholder="#ffffff">
             </div>
           </div>
-          <button class="convert-btn" id="qrBtn">⚡ <span data-i18n="generate">Générer le QR Code</span></button>
+          <button class="convert-btn" id="qrBtn">âš¡ <span data-i18n="generate">GÃ©nÃ©rer le QR Code</span></button>
         </div>
         <div class="qr-output hidden" id="qrOutput"></div>
       </div>
@@ -497,8 +497,8 @@
           <div class="option-group">
             <label data-i18n="b64_mode">Mode</label>
             <select id="base64Mode">
-              <option value="to">Image → Base64</option>
-              <option value="from">Base64 → Image</option>
+              <option value="to">Image â†’ Base64</option>
+              <option value="from">Base64 â†’ Image</option>
             </select>
           </div>
           <div class="hidden" id="base64InputArea" style="margin-top:12px">
@@ -506,7 +506,7 @@
               <label data-i18n="b64_paste">Collez le Base64 ici</label>
               <textarea id="base64Input" rows="5" placeholder="data:image/png;base64,iVBOR..."></textarea>
             </div>
-            <button class="convert-btn" id="base64DecodeBtn">⚡ <span data-i18n="b64_decode">Décoder en image</span></button>
+            <button class="convert-btn" id="base64DecodeBtn">âš¡ <span data-i18n="b64_decode">DÃ©coder en image</span></button>
           </div>
         </div>
         <div class="base64-output hidden" id="base64Output">
@@ -514,7 +514,7 @@
             <label>Base64</label>
             <textarea id="base64Result" readonly></textarea>
           </div>
-          <button class="btn-secondary" id="base64CopyBtn" style="margin-top:8px" data-i18n="copy">📋 Copier</button>
+          <button class="btn-secondary" id="base64CopyBtn" style="margin-top:8px" data-i18n="copy">ðŸ“‹ Copier</button>
         </div>
       </div>
 
@@ -522,7 +522,7 @@
       <div class="hidden" id="txt2imgSection">
         <div class="options-panel">
           <div class="option-group">
-            <label data-i18n="txt2img_text">Texte à convertir en image</label>
+            <label data-i18n="txt2img_text">Texte Ã  convertir en image</label>
             <textarea id="txt2imgInput" rows="4" placeholder="Votre texte ici..."></textarea>
           </div>
           <div class="options-row" style="margin-top:12px">
@@ -539,7 +539,7 @@
               <input type="text" id="txt2imgBg" value="#1a1a2e" placeholder="#1a1a2e">
             </div>
           </div>
-          <button class="convert-btn" id="txt2imgBtn">⚡ <span data-i18n="txt2img_gen">Générer l'image</span></button>
+          <button class="convert-btn" id="txt2imgBtn">âš¡ <span data-i18n="txt2img_gen">GÃ©nÃ©rer l'image</span></button>
         </div>
         <div class="txt2img-preview hidden" id="txt2imgPreview"></div>
       </div>
@@ -548,15 +548,15 @@
       <div class="hidden" id="asciiSection">
         <div class="options-panel">
           <div class="option-group">
-            <label data-i18n="ascii_width">Largeur (caractères)</label>
+            <label data-i18n="ascii_width">Largeur (caractÃ¨res)</label>
             <input type="number" id="asciiWidth" value="100" min="20" max="300">
           </div>
-          <button class="convert-btn" id="asciiBtn" style="margin-top:12px">⚡ <span data-i18n="ascii_gen">Générer l'ASCII Art</span></button>
+          <button class="convert-btn" id="asciiBtn" style="margin-top:12px">âš¡ <span data-i18n="ascii_gen">GÃ©nÃ©rer l'ASCII Art</span></button>
         </div>
         <div class="ascii-output hidden" id="asciiOutput">
           <pre id="asciiResult"></pre>
-          <button class="btn-secondary" id="asciiCopyBtn" style="margin-top:8px">📋 Copier</button>
-          <button class="btn-secondary" id="asciiDownloadBtn" style="margin-top:8px;margin-left:8px">⬇ Télécharger .txt</button>
+          <button class="btn-secondary" id="asciiCopyBtn" style="margin-top:8px">ðŸ“‹ Copier</button>
+          <button class="btn-secondary" id="asciiDownloadBtn" style="margin-top:8px;margin-left:8px">â¬‡ TÃ©lÃ©charger .txt</button>
         </div>
       </div>
 
@@ -580,14 +580,14 @@
         <div class="crop-container" id="cropContainer">
           <canvas id="cropCanvas"></canvas>
         </div>
-        <div class="crop-info" id="cropInfo" data-i18n="crop_hint">Cliquez et glissez pour sélectionner la zone à recadrer</div>
+        <div class="crop-info" id="cropInfo" data-i18n="crop_hint">Cliquez et glissez pour sÃ©lectionner la zone Ã  recadrer</div>
       </div>
 
       <!-- PREVIEW BEFORE/AFTER -->
       <div class="preview-area hidden" id="previewArea">
         <div class="preview-header">
-          <h4 data-i18n="preview">Aperçu</h4>
-          <button class="btn-secondary" id="closePreview" style="padding:4px 12px;font-size:.78rem">✕</button>
+          <h4 data-i18n="preview">AperÃ§u</h4>
+          <button class="btn-secondary" id="closePreview" style="padding:4px 12px;font-size:.78rem">âœ•</button>
         </div>
         <div class="preview-body">
           <div class="preview-side">
@@ -596,7 +596,7 @@
             <div class="preview-size" id="previewSizeBefore"></div>
           </div>
           <div class="preview-side">
-            <div class="preview-label" data-i18n="after">Après</div>
+            <div class="preview-label" data-i18n="after">AprÃ¨s</div>
             <img id="previewAfter" src="">
             <div class="preview-size" id="previewSizeAfter"></div>
           </div>
@@ -615,7 +615,7 @@
       <!-- FFMPEG NOTICE -->
       <div class="ffmpeg-notice hidden" id="ffmpegNotice">
         <div class="loader"></div>
-        <span data-i18n="ffmpeg_loading">Chargement du moteur vidéo/audio...</span>
+        <span data-i18n="ffmpeg_loading">Chargement du moteur vidÃ©o/audio...</span>
       </div>
 
       <!-- RESULTS -->
@@ -629,39 +629,39 @@
 
       <!-- HISTORY -->
       <div class="history-section hidden" id="historySection">
-        <h4 style="margin-bottom:12px" data-i18n="history_title">📋 Historique des conversions</h4>
+        <h4 style="margin-bottom:12px" data-i18n="history_title">ðŸ“‹ Historique des conversions</h4>
         <div id="historyList"></div>
-        <button class="btn-secondary history-clear" id="historyClear" data-i18n="history_clear">🗑️ Vider l'historique</button>
+        <button class="btn-secondary history-clear" id="historyClear" data-i18n="history_clear">ðŸ—‘ï¸ Vider l'historique</button>
       </div>
 
       <!-- ABOUT -->
       <div class="about-section hidden" id="aboutSection">
         <h2>ConvertAll</h2>
-        <p data-i18n="about_desc">ConvertAll est un convertisseur de fichiers 100% gratuit et respectueux de votre vie privée. Tous les fichiers sont traités directement dans votre navigateur — rien n'est envoyé sur un serveur.</p>
+        <p data-i18n="about_desc">ConvertAll est un convertisseur de fichiers 100% gratuit et respectueux de votre vie privÃ©e. Tous les fichiers sont traitÃ©s directement dans votre navigateur â€” rien n'est envoyÃ© sur un serveur.</p>
 
-        <h3 data-i18n="about_features">Fonctionnalités</h3>
+        <h3 data-i18n="about_features">FonctionnalitÃ©s</h3>
         <div class="feature-grid">
-          <div class="feature-card"><div class="fc-icon">🖼️</div><div class="fc-title" data-i18n="feat_img">Images</div><div class="fc-desc" data-i18n="feat_img_d">PNG, JPG, WebP + redimensionner, compresser, recadrer, pivoter</div></div>
-          <div class="feature-card"><div class="fc-icon">📄</div><div class="fc-title" data-i18n="feat_doc">Documents</div><div class="fc-desc" data-i18n="feat_doc_d">Images→PDF, fusion, extraction de pages</div></div>
-          <div class="feature-card"><div class="fc-icon">🎬</div><div class="fc-title" data-i18n="feat_media">Vidéo/Audio</div><div class="fc-desc" data-i18n="feat_media_d">MP4, WebM, GIF, MP3, WAV, OGG</div></div>
-          <div class="feature-card"><div class="fc-icon">📱</div><div class="fc-title" data-i18n="feat_qr">QR Code</div><div class="fc-desc" data-i18n="feat_qr_d">Générateur de QR Codes personnalisés</div></div>
-          <div class="feature-card"><div class="fc-icon">🎨</div><div class="fc-title" data-i18n="feat_color">Pipette</div><div class="fc-desc" data-i18n="feat_color_d">Extraire les couleurs d'une image</div></div>
-          <div class="feature-card"><div class="fc-icon">🔒</div><div class="fc-title" data-i18n="feat_priv">Privé</div><div class="fc-desc" data-i18n="feat_priv_d">100% local, aucun fichier uploadé</div></div>
+          <div class="feature-card"><div class="fc-icon">ðŸ–¼ï¸</div><div class="fc-title" data-i18n="feat_img">Images</div><div class="fc-desc" data-i18n="feat_img_d">PNG, JPG, WebP + redimensionner, compresser, recadrer, pivoter</div></div>
+          <div class="feature-card"><div class="fc-icon">ðŸ“„</div><div class="fc-title" data-i18n="feat_doc">Documents</div><div class="fc-desc" data-i18n="feat_doc_d">Imagesâ†’PDF, fusion, extraction de pages</div></div>
+          <div class="feature-card"><div class="fc-icon">ðŸŽ¬</div><div class="fc-title" data-i18n="feat_media">VidÃ©o/Audio</div><div class="fc-desc" data-i18n="feat_media_d">MP4, WebM, GIF, MP3, WAV, OGG</div></div>
+          <div class="feature-card"><div class="fc-icon">ðŸ“±</div><div class="fc-title" data-i18n="feat_qr">QR Code</div><div class="fc-desc" data-i18n="feat_qr_d">GÃ©nÃ©rateur de QR Codes personnalisÃ©s</div></div>
+          <div class="feature-card"><div class="fc-icon">ðŸŽ¨</div><div class="fc-title" data-i18n="feat_color">Pipette</div><div class="fc-desc" data-i18n="feat_color_d">Extraire les couleurs d'une image</div></div>
+          <div class="feature-card"><div class="fc-icon">ðŸ”’</div><div class="fc-title" data-i18n="feat_priv">PrivÃ©</div><div class="fc-desc" data-i18n="feat_priv_d">100% local, aucun fichier uploadÃ©</div></div>
         </div>
 
         <h3 data-i18n="about_tech">Technologies</h3>
         <ul>
-          <li>Canvas API — conversion d'images</li>
-          <li>pdf-lib — manipulation PDF</li>
-          <li>FFmpeg.wasm — conversion vidéo/audio</li>
-          <li>QRCode.js — génération QR</li>
+          <li>Canvas API â€” conversion d'images</li>
+          <li>pdf-lib â€” manipulation PDF</li>
+          <li>FFmpeg.wasm â€” conversion vidÃ©o/audio</li>
+          <li>QRCode.js â€” gÃ©nÃ©ration QR</li>
         </ul>
       </div>
     </main>
 
     <footer>
-      <p>ConvertAll — <span data-i18n="footer">Convertisseur de fichiers 100% gratuit</span></p>
-      <div class="privacy-badge">🔒 <span data-i18n="privacy">Vos fichiers restent sur votre appareil</span></div>
+      <p>ConvertAll â€” <span data-i18n="footer">Convertisseur de fichiers 100% gratuit</span></p>
+      <div class="privacy-badge">ðŸ”’ <span data-i18n="privacy">Vos fichiers restent sur votre appareil</span></div>
     </footer>
   </div>
 
@@ -669,7 +669,7 @@
 
   <!-- COOKIE BANNER RGPD -->
   <div class="cookie-banner hidden" id="cookieBanner">
-    <p data-i18n="cookie_text">🍪 Ce site utilise des cookies pour améliorer votre expérience et afficher des publicités. En continuant, vous acceptez notre politique de cookies.</p>
+    <p data-i18n="cookie_text">ðŸª Ce site utilise des cookies pour amÃ©liorer votre expÃ©rience et afficher des publicitÃ©s. En continuant, vous acceptez notre politique de cookies.</p>
     <div class="cookie-btns">
       <button class="cookie-accept" id="cookieAccept" data-i18n="cookie_accept">Accepter</button>
       <button class="cookie-decline" id="cookieDecline" data-i18n="cookie_decline">Refuser</button>
@@ -679,7 +679,7 @@
   <!-- INTERSTITIAL AD -->
   <div class="interstitial-overlay hidden" id="interstitialOverlay">
     <div class="interstitial-content">
-      <h3 data-i18n="interstitial_title">📢 Publicité</h3>
+      <h3 data-i18n="interstitial_title">ðŸ“¢ PublicitÃ©</h3>
       <div class="interstitial-ad-box">
         <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3295055468386254" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
@@ -693,35 +693,35 @@
     // ======================== TRANSLATIONS ========================
     const LANGS = {
       fr: {
-        subtitle:'Convertisseur de fichiers gratuit', tab_images:'Images', tab_docs:'Documents', tab_media:'Vidéo/Audio', tab_tools:'Outils', tab_about:'À propos',
-        drop_title:'Glissez vos fichiers ici', drop_sub:'ou cliquez pour sélectionner', output_format:'Format de sortie', quality:'Qualité', convert:'Convertir',
+        subtitle:'Convertisseur de fichiers gratuit', tab_images:'Images', tab_docs:'Documents', tab_media:'VidÃ©o/Audio', tab_tools:'Outils', tab_about:'Ã€ propos',
+        drop_title:'Glissez vos fichiers ici', drop_sub:'ou cliquez pour sÃ©lectionner', output_format:'Format de sortie', quality:'QualitÃ©', convert:'Convertir',
         width:'Largeur (px)', height:'Hauteur (px)', keep_ratio:'Garder le ratio', rotation:'Rotation', flip:'Miroir',
-        pdf_pages:'Pages (ex: 1-3, 5, 8)', tolerance:'Tolérance', bg_color:'Couleur de fond à supprimer',
-        qr_content:'Contenu du QR Code', qr_size:'Taille (px)', qr_color:'Couleur', qr_bg:'Fond', generate:'Générer le QR Code',
-        b64_mode:'Mode', b64_paste:'Collez le Base64 ici', b64_decode:'Décoder en image', copy:'📋 Copier',
-        palette:'Palette extraite :', crop_hint:'Cliquez et glissez pour sélectionner la zone à recadrer',
-        preview:'Aperçu', before:'Avant', after:'Après',
-        history_title:'📋 Historique des conversions', history_clear:'🗑️ Vider l\'historique',
-        batch_pattern:'Modèle de renommage', batch_help:'{name} = nom original, {index} = numéro, {ext} = extension de sortie',
-        about_desc:'ConvertAll est un convertisseur de fichiers 100% gratuit et respectueux de votre vie privée. Tous les fichiers sont traités directement dans votre navigateur — rien n\'est envoyé sur un serveur.',
-        about_features:'Fonctionnalités', about_tech:'Technologies',
+        pdf_pages:'Pages (ex: 1-3, 5, 8)', tolerance:'TolÃ©rance', bg_color:'Couleur de fond Ã  supprimer',
+        qr_content:'Contenu du QR Code', qr_size:'Taille (px)', qr_color:'Couleur', qr_bg:'Fond', generate:'GÃ©nÃ©rer le QR Code',
+        b64_mode:'Mode', b64_paste:'Collez le Base64 ici', b64_decode:'DÃ©coder en image', copy:'ðŸ“‹ Copier',
+        palette:'Palette extraite :', crop_hint:'Cliquez et glissez pour sÃ©lectionner la zone Ã  recadrer',
+        preview:'AperÃ§u', before:'Avant', after:'AprÃ¨s',
+        history_title:'ðŸ“‹ Historique des conversions', history_clear:'ðŸ—‘ï¸ Vider l\'historique',
+        batch_pattern:'ModÃ¨le de renommage', batch_help:'{name} = nom original, {index} = numÃ©ro, {ext} = extension de sortie',
+        about_desc:'ConvertAll est un convertisseur de fichiers 100% gratuit et respectueux de votre vie privÃ©e. Tous les fichiers sont traitÃ©s directement dans votre navigateur â€” rien n\'est envoyÃ© sur un serveur.',
+        about_features:'FonctionnalitÃ©s', about_tech:'Technologies',
         feat_img:'Images', feat_img_d:'PNG, JPG, WebP + redimensionner, compresser, recadrer, pivoter',
-        feat_doc:'Documents', feat_doc_d:'Images→PDF, fusion, extraction de pages',
-        feat_media:'Vidéo/Audio', feat_media_d:'MP4, WebM, GIF, MP3, WAV, OGG',
-        feat_qr:'QR Code', feat_qr_d:'Générateur de QR Codes personnalisés',
+        feat_doc:'Documents', feat_doc_d:'Imagesâ†’PDF, fusion, extraction de pages',
+        feat_media:'VidÃ©o/Audio', feat_media_d:'MP4, WebM, GIF, MP3, WAV, OGG',
+        feat_qr:'QR Code', feat_qr_d:'GÃ©nÃ©rateur de QR Codes personnalisÃ©s',
         feat_color:'Pipette', feat_color_d:'Extraire les couleurs d\'une image',
-        feat_priv:'Privé', feat_priv_d:'100% local, aucun fichier uploadé',
+        feat_priv:'PrivÃ©', feat_priv_d:'100% local, aucun fichier uploadÃ©',
         footer:'Convertisseur de fichiers 100% gratuit', privacy:'Vos fichiers restent sur votre appareil',
-        ffmpeg_loading:'Chargement du moteur vidéo/audio...',
+        ffmpeg_loading:'Chargement du moteur vidÃ©o/audio...',
         // Sub tools
         st_convert:'Convertir', st_resize:'Redimensionner', st_compress:'Compresser', st_crop:'Recadrer', st_rotate:'Pivoter', st_favicon:'Favicon',
-        st_qr:'QR Code', st_color:'Pipette', st_base64:'Base64', st_rmbg:'Suppr. fond', st_exif:'Suppr. EXIF', st_txt2img:'Texte→Image', st_ascii:'ASCII Art',
+        st_qr:'QR Code', st_color:'Pipette', st_base64:'Base64', st_rmbg:'Suppr. fond', st_exif:'Suppr. EXIF', st_txt2img:'Texteâ†’Image', st_ascii:'ASCII Art',
         presets:'Presets',
-        txt2img_text:'Texte à convertir en image', txt2img_font:'Taille police', txt2img_color:'Couleur texte', txt2img_bg:'Couleur fond', txt2img_gen:'Générer l\'image',
-        ascii_width:'Largeur (caractères)', ascii_gen:'Générer l\'ASCII Art',
-        cookie_text:'🍪 Ce site utilise des cookies pour améliorer votre expérience et afficher des publicités. En continuant, vous acceptez notre politique de cookies.',
+        txt2img_text:'Texte Ã  convertir en image', txt2img_font:'Taille police', txt2img_color:'Couleur texte', txt2img_bg:'Couleur fond', txt2img_gen:'GÃ©nÃ©rer l\'image',
+        ascii_width:'Largeur (caractÃ¨res)', ascii_gen:'GÃ©nÃ©rer l\'ASCII Art',
+        cookie_text:'ðŸª Ce site utilise des cookies pour amÃ©liorer votre expÃ©rience et afficher des publicitÃ©s. En continuant, vous acceptez notre politique de cookies.',
         cookie_accept:'Accepter', cookie_decline:'Refuser',
-        interstitial_title:'📢 Publicité', interstitial_close:'Continuer',
+        interstitial_title:'ðŸ“¢ PublicitÃ©', interstitial_close:'Continuer',
       },
       en: {
         subtitle:'Free file converter', tab_images:'Images', tab_docs:'Documents', tab_media:'Video/Audio', tab_tools:'Tools', tab_about:'About',
@@ -729,15 +729,15 @@
         width:'Width (px)', height:'Height (px)', keep_ratio:'Keep ratio', rotation:'Rotation', flip:'Flip',
         pdf_pages:'Pages (e.g. 1-3, 5, 8)', tolerance:'Tolerance', bg_color:'Background color to remove',
         qr_content:'QR Code content', qr_size:'Size (px)', qr_color:'Color', qr_bg:'Background', generate:'Generate QR Code',
-        b64_mode:'Mode', b64_paste:'Paste Base64 here', b64_decode:'Decode to image', copy:'📋 Copy',
+        b64_mode:'Mode', b64_paste:'Paste Base64 here', b64_decode:'Decode to image', copy:'ðŸ“‹ Copy',
         palette:'Extracted palette:', crop_hint:'Click and drag to select crop area',
         preview:'Preview', before:'Before', after:'After',
-        history_title:'📋 Conversion history', history_clear:'🗑️ Clear history',
+        history_title:'ðŸ“‹ Conversion history', history_clear:'ðŸ—‘ï¸ Clear history',
         batch_pattern:'Rename pattern', batch_help:'{name} = original name, {index} = number, {ext} = output extension',
-        about_desc:'ConvertAll is a 100% free and privacy-friendly file converter. All files are processed directly in your browser — nothing is uploaded to any server.',
+        about_desc:'ConvertAll is a 100% free and privacy-friendly file converter. All files are processed directly in your browser â€” nothing is uploaded to any server.',
         about_features:'Features', about_tech:'Technologies',
         feat_img:'Images', feat_img_d:'PNG, JPG, WebP + resize, compress, crop, rotate',
-        feat_doc:'Documents', feat_doc_d:'Images→PDF, merge, page extraction',
+        feat_doc:'Documents', feat_doc_d:'Imagesâ†’PDF, merge, page extraction',
         feat_media:'Video/Audio', feat_media_d:'MP4, WebM, GIF, MP3, WAV, OGG',
         feat_qr:'QR Code', feat_qr_d:'Custom QR Code generator',
         feat_color:'Color Picker', feat_color_d:'Extract colors from images',
@@ -745,13 +745,13 @@
         footer:'Free file converter', privacy:'Your files stay on your device',
         ffmpeg_loading:'Loading video/audio engine...',
         st_convert:'Convert', st_resize:'Resize', st_compress:'Compress', st_crop:'Crop', st_rotate:'Rotate', st_favicon:'Favicon',
-        st_qr:'QR Code', st_color:'Color Picker', st_base64:'Base64', st_rmbg:'Remove BG', st_exif:'Remove EXIF', st_txt2img:'Text→Image', st_ascii:'ASCII Art',
+        st_qr:'QR Code', st_color:'Color Picker', st_base64:'Base64', st_rmbg:'Remove BG', st_exif:'Remove EXIF', st_txt2img:'Textâ†’Image', st_ascii:'ASCII Art',
         presets:'Presets',
         txt2img_text:'Text to convert to image', txt2img_font:'Font size', txt2img_color:'Text color', txt2img_bg:'Background color', txt2img_gen:'Generate image',
         ascii_width:'Width (characters)', ascii_gen:'Generate ASCII Art',
-        cookie_text:'🍪 This site uses cookies to improve your experience and display ads. By continuing, you accept our cookie policy.',
+        cookie_text:'ðŸª This site uses cookies to improve your experience and display ads. By continuing, you accept our cookie policy.',
         cookie_accept:'Accept', cookie_decline:'Decline',
-        interstitial_title:'📢 Advertisement', interstitial_close:'Continue',
+        interstitial_title:'ðŸ“¢ Advertisement', interstitial_close:'Continue',
       }
     };
 
@@ -792,33 +792,33 @@
     function initTheme() {
       const saved = localStorage.getItem('convertall-theme');
       if (saved) document.documentElement.setAttribute('data-theme', saved);
-      $('#themeToggle').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+      $('#themeToggle').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
     }
     $('#themeToggle').addEventListener('click', () => {
       const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
-      $('#themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+      $('#themeToggle').textContent = next === 'dark' ? 'â˜€ï¸' : 'ðŸŒ™';
       localStorage.setItem('convertall-theme', next);
     });
 
     // ======================== TABS ========================
     const SUB_TOOLS = {
       images: [
-        { id:'convert', icon:'🔄', i18n:'st_convert' },
-        { id:'resize', icon:'↔️', i18n:'st_resize' },
-        { id:'compress', icon:'📦', i18n:'st_compress' },
-        { id:'crop', icon:'✂️', i18n:'st_crop' },
-        { id:'rotate', icon:'🔃', i18n:'st_rotate' },
-        { id:'favicon', icon:'⭐', i18n:'st_favicon' },
+        { id:'convert', icon:'ðŸ”„', i18n:'st_convert' },
+        { id:'resize', icon:'â†”ï¸', i18n:'st_resize' },
+        { id:'compress', icon:'ðŸ“¦', i18n:'st_compress' },
+        { id:'crop', icon:'âœ‚ï¸', i18n:'st_crop' },
+        { id:'rotate', icon:'ðŸ”ƒ', i18n:'st_rotate' },
+        { id:'favicon', icon:'â­', i18n:'st_favicon' },
       ],
       tools: [
-        { id:'qrcode', icon:'📱', i18n:'st_qr' },
-        { id:'colorpicker', icon:'🎨', i18n:'st_color' },
-        { id:'base64', icon:'🔤', i18n:'st_base64' },
-        { id:'removebg', icon:'🖼️', i18n:'st_rmbg' },
-        { id:'exif', icon:'🔒', i18n:'st_exif' },
-        { id:'txt2img', icon:'🔠', i18n:'st_txt2img' },
-        { id:'ascii', icon:'🎭', i18n:'st_ascii' },
+        { id:'qrcode', icon:'ðŸ“±', i18n:'st_qr' },
+        { id:'colorpicker', icon:'ðŸŽ¨', i18n:'st_color' },
+        { id:'base64', icon:'ðŸ”¤', i18n:'st_base64' },
+        { id:'removebg', icon:'ðŸ–¼ï¸', i18n:'st_rmbg' },
+        { id:'exif', icon:'ðŸ”’', i18n:'st_exif' },
+        { id:'txt2img', icon:'ðŸ” ', i18n:'st_txt2img' },
+        { id:'ascii', icon:'ðŸŽ­', i18n:'st_ascii' },
       ],
     };
 
@@ -860,10 +860,10 @@
     });
 
     const TAB_CONFIG = {
-      images: { icon:'🖼️', accept:'.png,.jpg,.jpeg,.webp,.bmp,.gif,.svg', hint:'PNG, JPG, WebP, BMP, GIF, SVG' },
-      documents: { icon:'📄', accept:'.pdf,.png,.jpg,.jpeg,.bmp,.webp,.txt', hint:'PDF, Images (PNG, JPG), TXT' },
-      media: { icon:'🎬', accept:'video/*,audio/*,.mp4,.webm,.avi,.mkv,.mov,.mp3,.wav,.ogg,.aac,.flac', hint:'MP4, WebM, AVI, MKV, MP3, WAV, OGG, AAC' },
-      tools: { icon:'🔧', accept:'image/*,.png,.jpg,.jpeg,.webp,.bmp,.gif', hint:'PNG, JPG, WebP, BMP, GIF' },
+      images: { icon:'ðŸ–¼ï¸', accept:'.png,.jpg,.jpeg,.webp,.bmp,.gif,.svg', hint:'PNG, JPG, WebP, BMP, GIF, SVG' },
+      documents: { icon:'ðŸ“„', accept:'.pdf,.png,.jpg,.jpeg,.bmp,.webp,.txt', hint:'PDF, Images (PNG, JPG), TXT' },
+      media: { icon:'ðŸŽ¬', accept:'video/*,audio/*,.mp4,.webm,.avi,.mkv,.mov,.mp3,.wav,.ogg,.aac,.flac', hint:'MP4, WebM, AVI, MKV, MP3, WAV, OGG, AAC' },
+      tools: { icon:'ðŸ”§', accept:'image/*,.png,.jpg,.jpeg,.webp,.bmp,.gif', hint:'PNG, JPG, WebP, BMP, GIF' },
     };
 
     const FORMAT_OPTIONS = {
@@ -872,9 +872,9 @@
       compress: [ {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'}, {v:'png',l:'PNG'} ],
       crop: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
       rotate: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
-      documents: [ {v:'images-to-pdf',l:'Images → PDF'}, {v:'merge-pdf',l:'Fusionner PDFs'}, {v:'split-pdf',l:'Extraire pages PDF'}, {v:'compress-pdf',l:'Compresser PDF'} ],
+      documents: [ {v:'images-to-pdf',l:'Images â†’ PDF'}, {v:'merge-pdf',l:'Fusionner PDFs'}, {v:'split-pdf',l:'Extraire pages PDF'}, {v:'compress-pdf',l:'Compresser PDF'} ],
       favicon: [ {v:'favicon-pack',l:'Pack Favicon (ZIP)'} ],
-      media: [ {v:'mp4',l:'MP4'}, {v:'webm',l:'WebM'}, {v:'gif',l:'GIF (animé)'}, {v:'mp3',l:'MP3'}, {v:'wav',l:'WAV'}, {v:'ogg',l:'OGG'} ],
+      media: [ {v:'mp4',l:'MP4'}, {v:'webm',l:'WebM'}, {v:'gif',l:'GIF (animÃ©)'}, {v:'mp3',l:'MP3'}, {v:'wav',l:'WAV'}, {v:'ogg',l:'OGG'} ],
       removebg: [ {v:'png',l:'PNG (transparent)'} ],
       exif: [ {v:'png',l:'PNG'}, {v:'jpeg',l:'JPG'}, {v:'webp',l:'WebP'} ],
     };
@@ -961,7 +961,7 @@
       // Rotate row
       if (currentSubTool === 'rotate') $('#rotateRow').classList.remove('hidden');
 
-      // PDF pages — show row if split-pdf is already selected
+      // PDF pages â€” show row if split-pdf is already selected
       if (currentTab === 'documents' && sel.value === 'split-pdf') {
         $('#pdfPageRow').classList.remove('hidden');
       }
@@ -1034,16 +1034,16 @@
         card.dataset.index = i;
 
         // Drag handle
-        const handle = document.createElement('span'); handle.className='drag-handle'; handle.textContent='⠿';
+        const handle = document.createElement('span'); handle.className='drag-handle'; handle.textContent='â ¿';
         const thumb = document.createElement('div'); thumb.className='file-thumb';
         if(file.type.startsWith('image/')) { const img=document.createElement('img'); const url=URL.createObjectURL(file); thumbURLs.push(url); img.src=url; thumb.appendChild(img); }
-        else if(file.type.startsWith('video/')) thumb.textContent='🎬';
-        else if(file.type.startsWith('audio/')) thumb.textContent='🎵';
-        else if(file.type==='application/pdf') thumb.textContent='📄';
-        else thumb.textContent='📁';
+        else if(file.type.startsWith('video/')) thumb.textContent='ðŸŽ¬';
+        else if(file.type.startsWith('audio/')) thumb.textContent='ðŸŽµ';
+        else if(file.type==='application/pdf') thumb.textContent='ðŸ“„';
+        else thumb.textContent='ðŸ“';
         const info = document.createElement('div'); info.className='file-info';
         info.innerHTML=`<div class="file-name">${esc(file.name)}</div><div class="file-size">${fmtSize(file.size)}</div>`;
-        const rm = document.createElement('button'); rm.className='file-remove'; rm.textContent='✕'; rm.onclick=()=>removeFile(i);
+        const rm = document.createElement('button'); rm.className='file-remove'; rm.textContent='âœ•'; rm.onclick=()=>removeFile(i);
         card.append(handle,thumb,info,rm);
 
         // Drag events for reordering
@@ -1100,7 +1100,7 @@
         toast('Erreur : '+err.message,'error');
       }
 
-      btn.disabled=false; btn.innerHTML='⚡ <span data-i18n="convert">'+(LANGS[currentLang].convert||'Convertir')+'</span>';
+      btn.disabled=false; btn.innerHTML='âš¡ <span data-i18n="convert">'+(LANGS[currentLang].convert||'Convertir')+'</span>';
       $('#progressSection').classList.add('hidden');
     }
 
@@ -1134,7 +1134,7 @@
         const name = applyBatchName(file.name, ext, i);
         convertedFiles.push({name, blob});
       }
-      progress(100,'Terminé !');
+      progress(100,'TerminÃ© !');
     }
 
     function imgToBlob(file, mime, quality, resizeW, resizeH) {
@@ -1149,7 +1149,7 @@
           const ctx=c.getContext('2d');
           if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);}
           ctx.drawImage(img,0,0,w,h);
-          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Conversion échouée'));},mime,quality);
+          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Conversion Ã©chouÃ©e'));},mime,quality);
           URL.revokeObjectURL(img.src);
         };
         img.onerror=()=>reject(new Error('Fichier illisible'));
@@ -1182,7 +1182,7 @@
           const sy=(flip==='v'||flip==='both')?-1:1;
           ctx.scale(sx,sy);
           ctx.drawImage(img,-img.naturalWidth/2,-img.naturalHeight/2);
-          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Rotation échouée'));},mime,quality);
+          c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Rotation Ã©chouÃ©e'));},mime,quality);
           URL.revokeObjectURL(img.src);
         };
         img.onerror=()=>reject(new Error('Fichier illisible'));
@@ -1254,22 +1254,22 @@
       ctx.strokeRect(x,y,w,h);
       ctx.setLineDash([]);
       const rw=Math.round(w/cropScale), rh=Math.round(h/cropScale);
-      $('#cropInfo').textContent=`Sélection : ${rw} × ${rh} px`;
+      $('#cropInfo').textContent=`SÃ©lection : ${rw} Ã— ${rh} px`;
     }
 
     function getCroppedBlob(mime,quality) {
       return new Promise((resolve,reject)=>{
-        if(!cropImg){reject(new Error('Pas de sélection'));return;}
+        if(!cropImg){reject(new Error('Pas de sÃ©lection'));return;}
         const x=Math.min(cropStartX,cropEndX)/cropScale;
         const y=Math.min(cropStartY,cropEndY)/cropScale;
         const w=Math.abs(cropEndX-cropStartX)/cropScale;
         const h=Math.abs(cropEndY-cropStartY)/cropScale;
-        if(w<2||h<2){reject(new Error('Sélection trop petite'));return;}
+        if(w<2||h<2){reject(new Error('SÃ©lection trop petite'));return;}
         const c=document.createElement('canvas'); c.width=Math.round(w); c.height=Math.round(h);
         const ctx=c.getContext('2d');
         if(mime==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);}
         ctx.drawImage(cropImg,x,y,w,h,0,0,c.width,c.height);
-        c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Crop échoué'));},mime,quality);
+        c.toBlob(b=>{if(b)resolve(b);else reject(new Error('Crop Ã©chouÃ©'));},mime,quality);
       });
     }
 
@@ -1283,7 +1283,7 @@
     }
 
     async function imagesToPdf() {
-      progress(10,'Création du PDF...');
+      progress(10,'CrÃ©ation du PDF...');
       const doc=await PDFLib.PDFDocument.create();
       for(let i=0;i<selectedFiles.length;i++){
         progress(10+(i/selectedFiles.length)*80,`Image ${i+1}/${selectedFiles.length}...`);
@@ -1297,7 +1297,7 @@
       }
       const pdfBytes=await doc.save();
       convertedFiles.push({name:'images-converties.pdf',blob:new Blob([pdfBytes],{type:'application/pdf'})});
-      progress(100,'Terminé !');
+      progress(100,'TerminÃ© !');
     }
 
     async function mergePdfs() {
@@ -1310,11 +1310,11 @@
         (await merged.copyPages(pdf,pdf.getPageIndices())).forEach(p=>merged.addPage(p));
       }
       convertedFiles.push({name:'fusion.pdf',blob:new Blob([await merged.save()],{type:'application/pdf'})});
-      progress(100,'Terminé !');
+      progress(100,'TerminÃ© !');
     }
 
     async function splitPdf() {
-      if(!selectedFiles.length||selectedFiles[0].type!=='application/pdf') throw new Error('Sélectionnez un PDF');
+      if(!selectedFiles.length||selectedFiles[0].type!=='application/pdf') throw new Error('SÃ©lectionnez un PDF');
       progress(10,'Extraction...');
       const src=await PDFLib.PDFDocument.load(new Uint8Array(await selectedFiles[0].arrayBuffer()));
       const indices=parsePageRange($('#pdfPages').value.trim(),src.getPageCount());
@@ -1322,7 +1322,7 @@
       (await newDoc.copyPages(src,indices)).forEach(p=>newDoc.addPage(p));
       const base=selectedFiles[0].name.replace('.pdf','');
       convertedFiles.push({name:`${base}-extrait.pdf`,blob:new Blob([await newDoc.save()],{type:'application/pdf'})});
-      progress(100,'Terminé !');
+      progress(100,'TerminÃ© !');
     }
 
     function parsePageRange(str,total) {
@@ -1349,7 +1349,7 @@
         const base='https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm';
         await ff.load({coreURL:await toBlobURL(`${base}/ffmpeg-core.js`,'text/javascript'),wasmURL:await toBlobURL(`${base}/ffmpeg-core.wasm`,'application/wasm')});
         ffmpegInstance=ff;
-      } catch(e){throw new Error('Moteur vidéo indisponible. Hébergez ce fichier sur un serveur web. '+e.message);}
+      } catch(e){throw new Error('Moteur vidÃ©o indisponible. HÃ©bergez ce fichier sur un serveur web. '+e.message);}
       finally{ffmpegLoading=false;$('#ffmpegNotice').classList.add('hidden');}
       return ffmpegInstance;
     }
@@ -1377,7 +1377,7 @@
         convertedFiles.push({name,blob:new Blob([data.buffer],{type:mimes[fmt]||'application/octet-stream'})});
         await ff.deleteFile(inp); await ff.deleteFile(out);
       }
-      progress(100,'Terminé !');
+      progress(100,'TerminÃ© !');
     }
 
     // ======================== TOOLS ========================
@@ -1395,7 +1395,7 @@
         const name=applyBatchName(selectedFiles[i].name,'png',i);
         convertedFiles.push({name,blob});
       }
-      progress(100,'Terminé !');
+      progress(100,'TerminÃ© !');
     }
 
     function removeBgFromFile(file,tolerance,mode) {
@@ -1434,7 +1434,7 @@
         const name=applyBatchName(selectedFiles[i].name,ext,i);
         convertedFiles.push({name,blob});
       }
-      progress(100,'EXIF supprimé !');
+      progress(100,'EXIF supprimÃ© !');
     }
 
     // ======================== QR CODE ========================
@@ -1452,13 +1452,13 @@
         out.appendChild(canvas);
         const dlBtn=document.createElement('button');
         dlBtn.className='convert-btn'; dlBtn.style.maxWidth='300px'; dlBtn.style.margin='16px auto 0';
-        dlBtn.textContent='⬇ Télécharger QR Code';
+        dlBtn.textContent='â¬‡ TÃ©lÃ©charger QR Code';
         dlBtn.onclick=()=>{
           canvas.toBlob(b=>{if(b)downloadFile('qrcode.png',b);},'image/png');
         };
         out.appendChild(dlBtn);
         addHistory(text.length, size*size*4, 'QR Code');
-        toast('QR Code généré !','success');
+        toast('QR Code gÃ©nÃ©rÃ© !','success');
       } catch(e){toast('Erreur : '+e.message,'error');}
     });
 
@@ -1555,7 +1555,7 @@
     }
 
     $('#base64CopyBtn').addEventListener('click',()=>{
-      navigator.clipboard.writeText($('#base64Result').value).then(()=>toast('Copié !','success'));
+      navigator.clipboard.writeText($('#base64Result').value).then(()=>toast('CopiÃ© !','success'));
     });
 
     $('#base64DecodeBtn').addEventListener('click',()=>{
@@ -1566,7 +1566,7 @@
         if(!val.startsWith('data:')) src='data:image/png;base64,'+val;
         const blob=dataURLtoBlob(src);
         downloadFile('decoded-image.png',blob);
-        toast('Image décodée !','success');
+        toast('Image dÃ©codÃ©e !','success');
       } catch(e){toast('Base64 invalide','error');}
     });
 
@@ -1606,9 +1606,9 @@
       const ratio=((1-outputSize/inputSize)*100).toFixed(1);
       const bar=$('#statsBar'); bar.innerHTML=''; bar.classList.remove('hidden');
       const items=[
-        {label:currentLang==='en'?'Input':'Entrée', value:fmtSize(inputSize), cls:''},
+        {label:currentLang==='en'?'Input':'EntrÃ©e', value:fmtSize(inputSize), cls:''},
         {label:currentLang==='en'?'Output':'Sortie', value:fmtSize(outputSize), cls:''},
-        {label:currentLang==='en'?'Reduction':'Réduction', value:(ratio>0?'-':'+')+ Math.abs(ratio)+'%', cls:ratio>0?'green':'red'},
+        {label:currentLang==='en'?'Reduction':'RÃ©duction', value:(ratio>0?'-':'+')+ Math.abs(ratio)+'%', cls:ratio>0?'green':'red'},
       ];
       items.forEach(it=>{
         const card=document.createElement('div'); card.className='stat-card'+(it.cls?' '+it.cls:'');
@@ -1622,12 +1622,12 @@
       const res=$('#results'); res.innerHTML='';
       convertedFiles.forEach((f,i)=>{
         const card=document.createElement('div'); card.className='result-card';
-        card.innerHTML=`<div class="result-icon">✓</div><div class="result-info"><div class="result-name">${esc(f.name)}</div><div class="result-size">${fmtSize(f.blob.size)}</div></div>`;
-        const dl=document.createElement('button'); dl.className='result-download'; dl.textContent='⬇'; dl.onclick=()=>downloadFile(f.name,f.blob);
+        card.innerHTML=`<div class="result-icon">âœ“</div><div class="result-info"><div class="result-name">${esc(f.name)}</div><div class="result-size">${fmtSize(f.blob.size)}</div></div>`;
+        const dl=document.createElement('button'); dl.className='result-download'; dl.textContent='â¬‡'; dl.onclick=()=>downloadFile(f.name,f.blob);
         card.appendChild(dl); res.appendChild(card);
       });
       if(convertedFiles.length>1){
-        const btn=document.createElement('button'); btn.className='download-all-btn'; btn.innerHTML='📦 Tout télécharger (ZIP)';
+        const btn=document.createElement('button'); btn.className='download-all-btn'; btn.innerHTML='ðŸ“¦ Tout tÃ©lÃ©charger (ZIP)';
         btn.onclick=downloadAllZip; res.appendChild(btn);
       }
     }
@@ -1687,10 +1687,10 @@
         const d=new Date(item.date);
         const div=document.createElement('div'); div.className='history-item';
         div.innerHTML=`
-          <span class="hi-icon">${item.type.includes('image')?'🖼️':item.type.includes('doc')?'📄':item.type.includes('media')?'🎬':'🔧'}</span>
+          <span class="hi-icon">${item.type.includes('image')?'ðŸ–¼ï¸':item.type.includes('doc')?'ðŸ“„':item.type.includes('media')?'ðŸŽ¬':'ðŸ”§'}</span>
           <div class="hi-info">
-            <div class="hi-detail">${esc(item.type)} — ${item.files} fichier(s)</div>
-            <div class="hi-sizes">${fmtSize(item.inputSize)} → ${fmtSize(item.outputSize)}</div>
+            <div class="hi-detail">${esc(item.type)} â€” ${item.files} fichier(s)</div>
+            <div class="hi-sizes">${fmtSize(item.inputSize)} â†’ ${fmtSize(item.outputSize)}</div>
           </div>
           <div class="hi-date">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div>
         `;
@@ -1699,7 +1699,7 @@
     }
 
     $('#historyBtn').addEventListener('click', showHistory);
-    $('#historyClear').addEventListener('click',()=>{ localStorage.removeItem('convertall-history'); renderHistory(); toast(currentLang==='en'?'History cleared':'Historique vidé','success'); });
+    $('#historyClear').addEventListener('click',()=>{ localStorage.removeItem('convertall-history'); renderHistory(); toast(currentLang==='en'?'History cleared':'Historique vidÃ©','success'); });
 
     // ======================== FORMAT CHANGE (PDF pages) ========================
     $('#outputFormat').addEventListener('change', () => {
@@ -1716,13 +1716,13 @@
     function progress(pct,text) { $('#progressFill').style.width=pct+'%'; $('#progressText').textContent=text; }
     function toast(msg,type='info') {
       const t=document.createElement('div'); t.className='toast '+type;
-      const icons={success:'✓',error:'✕',warning:'⚠',info:'ℹ'};
+      const icons={success:'âœ“',error:'âœ•',warning:'âš ',info:'â„¹'};
       t.innerHTML=`<span>${icons[type]||''}</span> ${esc(msg)}`;
       $('#toastContainer').appendChild(t); setTimeout(()=>t.remove(),3000);
     }
     function fmtSize(b) { if(b<1024)return b+' o'; if(b<1048576)return(b/1024).toFixed(1)+' Ko'; return(b/1048576).toFixed(2)+' Mo'; }
     function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-    function copyText(t) { navigator.clipboard.writeText(t).then(()=>toast('Copié !','success')); }
+    function copyText(t) { navigator.clipboard.writeText(t).then(()=>toast('CopiÃ© !','success')); }
 
     // ======================== COOKIE BANNER RGPD ========================
     function initCookieBanner() {
@@ -1753,7 +1753,7 @@
       if (files.length) {
         e.preventDefault();
         addFiles(files);
-        toast(currentLang === 'en' ? 'Image pasted!' : 'Image collée !', 'success');
+        toast(currentLang === 'en' ? 'Image pasted!' : 'Image collÃ©e !', 'success');
       }
     });
 
@@ -1867,7 +1867,7 @@
       RESIZE_PRESETS.forEach(p => {
         const chip = document.createElement('button');
         chip.className = 'preset-chip';
-        chip.textContent = `${p.label} (${p.w}×${p.h})`;
+        chip.textContent = `${p.label} (${p.w}Ã—${p.h})`;
         chip.addEventListener('click', () => {
           $('#resizeW').value = p.w;
           $('#resizeH').value = p.h;
@@ -1878,7 +1878,7 @@
 
     // ======================== PDF COMPRESSOR ========================
     async function compressPdf() {
-      if (!selectedFiles.length || selectedFiles[0].type !== 'application/pdf') throw new Error('Sélectionnez un PDF');
+      if (!selectedFiles.length || selectedFiles[0].type !== 'application/pdf') throw new Error('SÃ©lectionnez un PDF');
       progress(20, 'Compression du PDF...');
       const src = await PDFLib.PDFDocument.load(new Uint8Array(await selectedFiles[0].arrayBuffer()), { ignoreEncryption: true });
       // Re-save the PDF (pdf-lib strips some metadata and optimizes)
@@ -1891,7 +1891,7 @@
       const pdfBytes = await newDoc.save();
       const base = selectedFiles[0].name.replace('.pdf', '');
       convertedFiles.push({ name: `${base}-compressed.pdf`, blob: new Blob([pdfBytes], { type: 'application/pdf' }) });
-      progress(100, 'Terminé !');
+      progress(100, 'TerminÃ© !');
     }
 
     // ======================== TEXT TO IMAGE ========================
@@ -1934,25 +1934,25 @@
 
       const dlBtn = document.createElement('button');
       dlBtn.className = 'convert-btn'; dlBtn.style.maxWidth = '300px'; dlBtn.style.margin = '16px auto 0';
-      dlBtn.textContent = '⬇ ' + (currentLang === 'en' ? 'Download image' : 'Télécharger l\'image');
+      dlBtn.textContent = 'â¬‡ ' + (currentLang === 'en' ? 'Download image' : 'TÃ©lÃ©charger l\'image');
       dlBtn.onclick = () => {
         canvas.toBlob(b => { if (b) downloadFile('text-image.png', b); }, 'image/png');
       };
       preview.appendChild(dlBtn);
-      toast(currentLang === 'en' ? 'Image generated!' : 'Image générée !', 'success');
+      toast(currentLang === 'en' ? 'Image generated!' : 'Image gÃ©nÃ©rÃ©e !', 'success');
     });
 
     // ======================== FAVICON GENERATOR ========================
     async function generateFavicon() {
       if (!selectedFiles.length) { toast(currentLang === 'en' ? 'Add an image' : 'Ajoutez une image', 'warning'); return; }
-      progress(10, 'Génération du pack favicon...');
+      progress(10, 'GÃ©nÃ©ration du pack favicon...');
       const sizes = [16, 32, 48, 64, 128, 180, 192, 512];
       const zip = new JSZip();
 
       const img = await loadImage(selectedFiles[0]);
       for (let i = 0; i < sizes.length; i++) {
         const size = sizes[i];
-        progress(10 + (i / sizes.length) * 80, `Favicon ${size}×${size}...`);
+        progress(10 + (i / sizes.length) * 80, `Favicon ${size}Ã—${size}...`);
         const canvas = document.createElement('canvas');
         canvas.width = size; canvas.height = size;
         const ctx = canvas.getContext('2d');
@@ -1974,7 +1974,7 @@
       URL.revokeObjectURL(img.src);
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       convertedFiles.push({ name: 'favicon-pack.zip', blob: zipBlob });
-      progress(100, 'Terminé !');
+      progress(100, 'TerminÃ© !');
     }
 
     function loadImage(file) {
@@ -2024,14 +2024,14 @@
         const ascii = await generateAsciiArt(selectedFiles[0], width);
         $('#asciiResult').textContent = ascii;
         $('#asciiOutput').classList.remove('hidden');
-        toast(currentLang === 'en' ? 'ASCII art generated!' : 'ASCII art généré !', 'success');
+        toast(currentLang === 'en' ? 'ASCII art generated!' : 'ASCII art gÃ©nÃ©rÃ© !', 'success');
       } catch (e) {
         toast('Erreur : ' + e.message, 'error');
       }
     });
 
     $('#asciiCopyBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText($('#asciiResult').textContent).then(() => toast('Copié !', 'success'));
+      navigator.clipboard.writeText($('#asciiResult').textContent).then(() => toast('CopiÃ© !', 'success'));
     });
 
     $('#asciiDownloadBtn').addEventListener('click', () => {
