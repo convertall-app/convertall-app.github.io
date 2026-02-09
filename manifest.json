@@ -1,0 +1,15 @@
+{
+  "name": "ConvertAll — Convertisseur de Fichiers Gratuit",
+  "short_name": "ConvertAll",
+  "description": "Convertisseur de fichiers 100% gratuit et privé. Images, PDF, vidéo, audio, QR Code et plus.",
+  "start_url": "/home.html",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#667eea",
+  "orientation": "any",
+  "icons": [
+    { "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%23667eea'/><stop offset='100%25' stop-color='%23764ba2'/></linearGradient></defs><circle cx='50' cy='50' r='48' fill='url(%23g)'/><text x='50' y='68' font-size='60' font-weight='bold' font-family='sans-serif' fill='white' text-anchor='middle'>C</text></svg>", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "categories": ["utilities", "productivity"],
+  "lang": "fr"
+}
