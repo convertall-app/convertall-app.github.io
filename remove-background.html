@@ -1010,8 +1010,12 @@
       if(!files.length) return;
       selectedFiles.push(...files);
       renderFiles();
-      $('#optionsPanel').classList.remove('hidden');
-      if(selectedFiles.length > 1) $('#batchRenamePanel').classList.remove('hidden');
+      const noConvertTools = ['colorpicker', 'base64', 'qrcode', 'txt2img', 'ascii'];
+      const isNoConvertTool = currentTab === 'tools' && noConvertTools.includes(currentSubTool);
+      if (!isNoConvertTool) {
+        $('#optionsPanel').classList.remove('hidden');
+        if(selectedFiles.length > 1) $('#batchRenamePanel').classList.remove('hidden');
+      }
       clearResults();
 
       // Special: color picker auto-load
@@ -1098,14 +1102,18 @@
         else if(currentTab==='media') await processMedia();
         else if(currentTab==='tools') await processTools();
 
-        totalOutputSize = convertedFiles.reduce((s,f)=>s+f.blob.size,0);
-        showStats(totalInputSize, totalOutputSize);
-        showPreview();
-        renderResults();
-        addHistory(totalInputSize, totalOutputSize);
-        toast(`${convertedFiles.length} fichier(s) converti(s) !`,'success');
-        launchConfetti();
-        showInterstitialIfNeeded();
+        if (convertedFiles.length > 0) {
+          totalOutputSize = convertedFiles.reduce((s,f)=>s+f.blob.size,0);
+          showStats(totalInputSize, totalOutputSize);
+          showPreview();
+          renderResults();
+          addHistory(totalInputSize, totalOutputSize);
+          toast(`${convertedFiles.length} fichier(s) converti(s) !`,'success');
+          launchConfetti();
+          showInterstitialIfNeeded();
+        } else {
+          toast(currentLang==='en'?'No conversion performed':'Aucune conversion effectuée','warning');
+        }
       } catch(err) {
         console.error(err);
         toast('Erreur : '+err.message,'error');
@@ -2139,7 +2147,10 @@
     // Auto-select format after UI is built
     if (autoFormat) {
       const sel = $('#outputFormat');
-      if (sel) sel.value = autoFormat;
+      if (sel) {
+        sel.value = autoFormat;
+        sel.dispatchEvent(new Event('change'));
+      }
     }
   </script>
 </body>
