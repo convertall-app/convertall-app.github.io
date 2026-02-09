@@ -4,9 +4,30 @@
 
 ---
 
-## Démo rapide
+## Liens du site
 
-Ouvrez simplement `index.html` dans votre navigateur (Chrome recommandé).
+| Page | Lien |
+|------|------|
+| **Homepage** | https://convertall-app.github.io/home.html |
+| **App complète** | https://convertall-app.github.io/index.html |
+| **Admin** | https://convertall-app.github.io/admin.html |
+| Convertir Image | https://convertall-app.github.io/convert-image.html |
+| Redimensionner Image | https://convertall-app.github.io/resize-image.html |
+| Compresser Image | https://convertall-app.github.io/compress-image.html |
+| Recadrer Image | https://convertall-app.github.io/crop-image.html |
+| Pivoter Image | https://convertall-app.github.io/rotate-image.html |
+| Favicon Generator | https://convertall-app.github.io/favicon-generator.html |
+| Compresser PDF | https://convertall-app.github.io/compress-pdf.html |
+| Fusionner PDF | https://convertall-app.github.io/merge-pdf.html |
+| Extraire Pages PDF | https://convertall-app.github.io/split-pdf.html |
+| Images → PDF | https://convertall-app.github.io/images-to-pdf.html |
+| QR Code Generator | https://convertall-app.github.io/qr-code-generator.html |
+| Pipette Couleur | https://convertall-app.github.io/color-picker.html |
+| Base64 Converter | https://convertall-app.github.io/base64-converter.html |
+| Supprimer Fond | https://convertall-app.github.io/remove-background.html |
+| Supprimer EXIF | https://convertall-app.github.io/remove-exif.html |
+| Texte → Image | https://convertall-app.github.io/text-to-image.html |
+| ASCII Art | https://convertall-app.github.io/ascii-art.html |
 
 ---
 
