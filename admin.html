@@ -7,102 +7,188 @@
   <title>Admin — ConvertAll</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#0f0f1a; --bg2:#1a1a2e; --bg3:#16213e; --card:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1); --text:#f0f0f0; --text2:#a0a0b0; --accent:#667eea; --accent2:#764ba2; --green:#10b981; --red:#ef4444; --orange:#f59e0b; --radius:14px; }
-    body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    :root { --bg:#0a0a14; --bg2:#12121f; --bg3:#1a1a2e; --card:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.08); --text:#f0f0f0; --text2:#8888a0; --accent:#667eea; --accent2:#764ba2; --green:#10b981; --red:#ef4444; --orange:#f59e0b; --cyan:#06b6d4; --pink:#ec4899; --radius:16px; }
+    body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+    ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--bg); } ::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:3px; }
 
-    /* LOGIN */
-    .login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:16px; }
-    .login-box { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:40px; max-width:400px; width:100%; text-align:center; }
-    .login-box h1 { font-size:1.6rem; margin-bottom:8px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .login-box p { color:var(--text2); font-size:.88rem; margin-bottom:24px; }
-    .login-input { width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-size:1rem; outline:none; margin-bottom:12px; }
-    .login-input:focus { border-color:var(--accent); }
-    .login-btn { width:100%; padding:12px; border:none; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-size:1rem; font-weight:700; cursor:pointer; transition:all .3s; }
-    .login-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(102,126,234,0.3); }
-    .login-error { color:var(--red); font-size:.82rem; margin-top:8px; display:none; }
+    /* ===== LOGIN ===== */
+    .login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:16px; position:relative; overflow:hidden; }
+    .login-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 20% 50%, rgba(102,126,234,0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 50%, rgba(118,75,162,0.15) 0%, transparent 50%); animation:bgPulse 6s ease-in-out infinite alternate; }
+    @keyframes bgPulse { 0%{opacity:.6} 100%{opacity:1} }
+    .login-box { background:var(--bg2); border:1px solid var(--border); border-radius:24px; padding:48px 40px; max-width:420px; width:100%; text-align:center; position:relative; z-index:1; backdrop-filter:blur(20px); }
+    .login-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 20px; box-shadow:0 8px 32px rgba(102,126,234,0.3); }
+    .login-box h1 { font-size:1.5rem; margin-bottom:6px; }
+    .login-box p { color:var(--text2); font-size:.84rem; margin-bottom:28px; }
+    .input-group { position:relative; margin-bottom:16px; }
+    .input-group input { width:100%; padding:14px 16px 14px 44px; border:1px solid var(--border); border-radius:12px; background:var(--bg); color:var(--text); font-size:.95rem; outline:none; transition:all .3s; }
+    .input-group input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(102,126,234,0.15); }
+    .input-group .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text2); font-size:1.1rem; }
+    .login-btn { width:100%; padding:14px; border:none; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-size:1rem; font-weight:700; cursor:pointer; transition:all .3s; letter-spacing:.3px; }
+    .login-btn:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(102,126,234,0.35); }
+    .login-btn:active { transform:translateY(0); }
+    .login-error { color:var(--red); font-size:.82rem; margin-top:10px; display:none; padding:8px; border-radius:8px; background:rgba(239,68,68,0.1); }
 
-    /* DASHBOARD */
+    /* ===== DASHBOARD ===== */
     .dashboard { display:none; }
-    .sidebar { position:fixed; left:0; top:0; bottom:0; width:240px; background:var(--bg2); border-right:1px solid var(--border); padding:20px 0; overflow-y:auto; z-index:10; }
-    .sidebar-logo { padding:0 20px 20px; border-bottom:1px solid var(--border); margin-bottom:16px; }
-    .sidebar-logo h2 { font-size:1.1rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .sidebar-logo span { font-size:.72rem; color:var(--text2); }
-    .nav-item { display:flex; align-items:center; gap:10px; padding:10px 20px; color:var(--text2); font-size:.88rem; cursor:pointer; transition:all .2s; text-decoration:none; border:none; background:none; width:100%; text-align:left; }
-    .nav-item:hover { background:rgba(102,126,234,0.1); color:var(--text); }
-    .nav-item.active { background:rgba(102,126,234,0.15); color:var(--accent); border-right:3px solid var(--accent); }
-    .nav-item .nav-icon { font-size:1.1rem; width:24px; text-align:center; }
-    .nav-divider { height:1px; background:var(--border); margin:12px 20px; }
 
-    .main { margin-left:240px; padding:24px; }
-    .main-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
-    .main-header h1 { font-size:1.4rem; }
-    .main-header .logout-btn { padding:8px 16px; border:1px solid var(--border); border-radius:8px; background:none; color:var(--text2); font-size:.82rem; cursor:pointer; transition:all .2s; }
-    .main-header .logout-btn:hover { border-color:var(--red); color:var(--red); }
+    /* SIDEBAR */
+    .sidebar { position:fixed; left:0; top:0; bottom:0; width:260px; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:100; transition:transform .3s; }
+    .sidebar-header { padding:20px 20px 16px; border-bottom:1px solid var(--border); }
+    .sidebar-brand { display:flex; align-items:center; gap:10px; }
+    .sidebar-brand .brand-icon { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:800; color:#fff; }
+    .sidebar-brand h2 { font-size:1.05rem; font-weight:700; }
+    .sidebar-brand span { display:block; font-size:.68rem; color:var(--text2); font-weight:400; margin-top:1px; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:12px 0; }
+    .nav-label { padding:8px 20px 6px; font-size:.65rem; color:var(--text2); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .nav-item { display:flex; align-items:center; gap:10px; padding:10px 20px; color:var(--text2); font-size:.86rem; cursor:pointer; transition:all .2s; text-decoration:none; border:none; background:none; width:100%; text-align:left; border-left:3px solid transparent; }
+    .nav-item:hover { background:rgba(102,126,234,0.08); color:var(--text); }
+    .nav-item.active { background:rgba(102,126,234,0.12); color:var(--accent); border-left-color:var(--accent); }
+    .nav-item .nav-icon { font-size:1.05rem; width:22px; text-align:center; }
+    .nav-item .nav-badge { margin-left:auto; padding:1px 8px; border-radius:10px; font-size:.65rem; font-weight:700; background:rgba(102,126,234,0.2); color:var(--accent); }
+    .sidebar-footer { padding:16px 20px; border-top:1px solid var(--border); }
+    .sidebar-user { display:flex; align-items:center; gap:10px; }
+    .sidebar-user .user-avatar { width:32px; height:32px; border-radius:8px; background:linear-gradient(135deg,var(--green),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:.8rem; color:#fff; font-weight:700; }
+    .sidebar-user .user-name { font-size:.82rem; font-weight:600; }
+    .sidebar-user .user-role { font-size:.68rem; color:var(--text2); }
 
-    /* CARDS */
-    .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin-bottom:24px; }
-    .stat-card { background:var(--card); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
-    .stat-card .stat-label { font-size:.76rem; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
-    .stat-card .stat-value { font-size:1.8rem; font-weight:800; }
-    .stat-card .stat-sub { font-size:.74rem; color:var(--text2); margin-top:4px; }
-    .stat-card.accent .stat-value { color:var(--accent); }
-    .stat-card.green .stat-value { color:var(--green); }
-    .stat-card.orange .stat-value { color:var(--orange); }
+    /* MOBILE MENU */
+    .mobile-header { display:none; position:fixed; top:0; left:0; right:0; height:56px; background:var(--bg2); border-bottom:1px solid var(--border); z-index:99; padding:0 16px; align-items:center; gap:12px; }
+    .burger { background:none; border:none; color:var(--text); font-size:1.4rem; cursor:pointer; padding:4px; }
+    .mobile-title { font-size:.95rem; font-weight:700; }
+    .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99; }
+
+    /* MAIN */
+    .main { margin-left:260px; padding:28px; min-height:100vh; }
+    .main-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+    .main-top h1 { font-size:1.5rem; font-weight:800; }
+    .main-top-right { display:flex; align-items:center; gap:12px; }
+    .clock { font-size:.82rem; color:var(--text2); font-family:monospace; background:var(--bg2); padding:6px 14px; border-radius:8px; border:1px solid var(--border); }
+    .refresh-btn { padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:none; color:var(--text2); cursor:pointer; transition:all .2s; font-size:.9rem; }
+    .refresh-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .logout-btn { padding:8px 16px; border:1px solid var(--border); border-radius:8px; background:none; color:var(--text2); font-size:.82rem; cursor:pointer; transition:all .2s; }
+    .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+    /* STATS CARDS */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-bottom:24px; }
+    .stat-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; position:relative; overflow:hidden; transition:all .3s; }
+    .stat-card:hover { border-color:rgba(102,126,234,0.3); transform:translateY(-2px); }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; }
+    .stat-card.c-accent::before { background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+    .stat-card.c-green::before { background:var(--green); }
+    .stat-card.c-orange::before { background:var(--orange); }
+    .stat-card.c-cyan::before { background:var(--cyan); }
+    .stat-card.c-pink::before { background:var(--pink); }
+    .stat-card.c-red::before { background:var(--red); }
+    .stat-card .sc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .stat-card .sc-label { font-size:.72rem; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+    .stat-card .sc-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+    .stat-card.c-accent .sc-icon { background:rgba(102,126,234,0.15); }
+    .stat-card.c-green .sc-icon { background:rgba(16,185,129,0.15); }
+    .stat-card.c-orange .sc-icon { background:rgba(245,158,11,0.15); }
+    .stat-card.c-cyan .sc-icon { background:rgba(6,182,212,0.15); }
+    .stat-card.c-pink .sc-icon { background:rgba(236,72,153,0.15); }
+    .stat-card.c-red .sc-icon { background:rgba(239,68,68,0.15); }
+    .stat-card .sc-value { font-size:1.7rem; font-weight:800; line-height:1; }
+    .stat-card .sc-sub { font-size:.72rem; color:var(--text2); margin-top:6px; }
 
     /* PANELS */
-    .panel { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:20px; }
-    .panel h3 { font-size:1rem; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    .panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:18px; overflow:hidden; }
+    .panel-head { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .panel-head h3 { font-size:.92rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .panel-head .ph-actions { display:flex; gap:6px; }
+    .panel-body { padding:16px 20px; }
     .panel-section { display:none; }
     .panel-section.active { display:block; }
 
+    /* GRID 2 COL */
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
     /* TABLE */
-    .table { width:100%; border-collapse:collapse; font-size:.82rem; }
-    .table th { text-align:left; padding:10px 12px; border-bottom:2px solid var(--border); color:var(--text2); font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; }
-    .table td { padding:10px 12px; border-bottom:1px solid var(--border); }
-    .table tr:hover td { background:rgba(102,126,234,0.05); }
-    .badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:.68rem; font-weight:600; }
+    .table-wrap { overflow-x:auto; }
+    .table { width:100%; border-collapse:collapse; font-size:.8rem; }
+    .table th { text-align:left; padding:10px 14px; color:var(--text2); font-size:.68rem; text-transform:uppercase; letter-spacing:.5px; font-weight:700; background:rgba(255,255,255,0.02); }
+    .table td { padding:10px 14px; border-top:1px solid var(--border); }
+    .table tr:hover td { background:rgba(102,126,234,0.04); }
+    .badge { display:inline-block; padding:3px 10px; border-radius:6px; font-size:.68rem; font-weight:600; }
     .badge.green { background:rgba(16,185,129,0.15); color:var(--green); }
     .badge.blue { background:rgba(102,126,234,0.15); color:var(--accent); }
     .badge.orange { background:rgba(245,158,11,0.15); color:var(--orange); }
+    .badge.red { background:rgba(239,68,68,0.15); color:var(--red); }
+    .badge.cyan { background:rgba(6,182,212,0.15); color:var(--cyan); }
 
-    /* LINKS */
-    .quick-links { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
-    .quick-link { display:flex; align-items:center; gap:12px; padding:16px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); text-decoration:none; color:var(--text); transition:all .2s; }
-    .quick-link:hover { border-color:var(--accent); transform:translateY(-2px); }
-    .quick-link .ql-icon { font-size:1.6rem; }
-    .quick-link .ql-title { font-weight:600; font-size:.88rem; }
-    .quick-link .ql-desc { font-size:.74rem; color:var(--text2); }
+    /* CHART BAR */
+    .chart-bars { display:flex; align-items:flex-end; gap:6px; height:120px; padding-top:10px; }
+    .chart-bar { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .chart-bar .cb-fill { width:100%; border-radius:6px 6px 0 0; background:linear-gradient(180deg,var(--accent),var(--accent2)); min-height:2px; transition:height .6s ease; }
+    .chart-bar .cb-label { font-size:.6rem; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; text-align:center; }
+    .chart-bar .cb-value { font-size:.64rem; font-weight:700; color:var(--accent); }
+
+    /* ACTIVITY DOTS */
+    .activity-grid { display:flex; gap:3px; flex-wrap:wrap; }
+    .activity-dot { width:14px; height:14px; border-radius:3px; background:rgba(255,255,255,0.05); }
+    .activity-dot.l1 { background:rgba(102,126,234,0.2); }
+    .activity-dot.l2 { background:rgba(102,126,234,0.4); }
+    .activity-dot.l3 { background:rgba(102,126,234,0.6); }
+    .activity-dot.l4 { background:rgba(102,126,234,0.9); }
+
+    /* QUICK LINKS */
+    .quick-links { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+    .quick-link { display:flex; align-items:center; gap:14px; padding:18px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); text-decoration:none; color:var(--text); transition:all .25s; }
+    .quick-link:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+    .quick-link .ql-icon { font-size:1.8rem; width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:rgba(102,126,234,0.1); flex-shrink:0; }
+    .quick-link .ql-title { font-weight:700; font-size:.88rem; }
+    .quick-link .ql-desc { font-size:.72rem; color:var(--text2); margin-top:2px; }
+
+    /* PAGES */
+    .page-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border:1px solid var(--border); border-radius:12px; margin-bottom:8px; background:var(--bg); transition:all .2s; }
+    .page-item:hover { border-color:rgba(102,126,234,0.3); }
+    .page-item .page-icon { font-size:1.3rem; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(102,126,234,0.1); }
+    .page-item .page-info { flex:1; min-width:0; }
+    .page-item .page-name { font-weight:700; font-size:.84rem; }
+    .page-item .page-url { font-size:.7rem; color:var(--text2); font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .page-actions { display:flex; gap:6px; }
+    .btn-sm { padding:5px 12px; border:1px solid var(--border); border-radius:6px; background:none; color:var(--text2); font-size:.72rem; cursor:pointer; transition:all .2s; text-decoration:none; white-space:nowrap; }
+    .btn-sm:hover { border-color:var(--accent); color:var(--accent); }
+    .btn-sm.primary { background:rgba(102,126,234,0.15); border-color:rgba(102,126,234,0.3); color:var(--accent); }
 
     /* SETTINGS */
-    .setting-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); }
+    .setting-row { display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--border); gap:16px; }
     .setting-row:last-child { border-bottom:none; }
-    .setting-label { font-weight:600; font-size:.88rem; }
-    .setting-desc { font-size:.74rem; color:var(--text2); margin-top:2px; }
-    .toggle { position:relative; width:44px; height:24px; cursor:pointer; }
-    .toggle input { display:none; }
-    .toggle .slider { position:absolute; inset:0; background:var(--bg); border:1px solid var(--border); border-radius:12px; transition:all .3s; }
-    .toggle .slider::before { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:var(--text2); top:2px; left:2px; transition:all .3s; }
-    .toggle input:checked + .slider { background:var(--accent); border-color:var(--accent); }
-    .toggle input:checked + .slider::before { transform:translateX(20px); background:#fff; }
-    .setting-input { padding:6px 12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:.84rem; width:200px; }
-    .setting-btn { padding:8px 16px; border:none; border-radius:8px; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-weight:600; font-size:.82rem; cursor:pointer; transition:all .3s; }
-    .setting-btn:hover { transform:translateY(-1px); }
-    .setting-btn.danger { background:var(--red); }
+    .setting-label { font-weight:600; font-size:.86rem; }
+    .setting-desc { font-size:.72rem; color:var(--text2); margin-top:2px; }
+    .setting-input { padding:8px 14px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); font-size:.84rem; min-width:140px; outline:none; transition:border .2s; }
+    .setting-input:focus { border-color:var(--accent); }
+    .btn { padding:9px 18px; border:none; border-radius:10px; font-weight:600; font-size:.82rem; cursor:pointer; transition:all .3s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(102,126,234,0.3); }
+    .btn-danger { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+    .btn-danger:hover { background:rgba(239,68,68,0.25); }
+    .btn-ghost { background:none; color:var(--text2); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
 
-    /* PAGES LIST */
-    .page-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; background:var(--bg2); }
-    .page-item .page-icon { font-size:1.2rem; }
-    .page-item .page-info { flex:1; }
-    .page-item .page-name { font-weight:600; font-size:.84rem; }
-    .page-item .page-url { font-size:.72rem; color:var(--text2); font-family:monospace; }
-    .page-item .page-link { padding:4px 12px; border:1px solid var(--border); border-radius:6px; background:none; color:var(--accent); font-size:.74rem; cursor:pointer; text-decoration:none; transition:all .2s; }
-    .page-item .page-link:hover { background:rgba(102,126,234,0.1); }
+    /* SEARCH */
+    .search-bar { display:flex; gap:8px; margin-bottom:16px; }
+    .search-input { flex:1; padding:10px 14px 10px 36px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); font-size:.84rem; outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%238888a0' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.44.856a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:12px center; }
+    .search-input:focus { border-color:var(--accent); }
+
+    /* TOAST */
+    .toast-c { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+    .toast { padding:12px 20px; border-radius:10px; font-size:.84rem; font-weight:600; color:#fff; animation:toastIn .3s ease; backdrop-filter:blur(10px); }
+    .toast.success { background:rgba(16,185,129,0.9); }
+    .toast.error { background:rgba(239,68,68,0.9); }
+    .toast.info { background:rgba(102,126,234,0.9); }
+    @keyframes toastIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 
     /* RESPONSIVE */
     @media (max-width:768px) {
-      .sidebar { display:none; }
-      .main { margin-left:0; }
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+      .overlay.open { display:block; }
+      .mobile-header { display:flex; }
+      .main { margin-left:0; padding:72px 16px 24px; }
       .stats-grid { grid-template-columns:1fr 1fr; }
+      .grid-2 { grid-template-columns:1fr; }
+      .setting-row { flex-direction:column; align-items:flex-start; }
     }
   </style>
 </head>
@@ -110,408 +196,540 @@
 
   <!-- LOGIN -->
   <div class="login-screen" id="loginScreen">
+    <div class="login-bg"></div>
     <div class="login-box">
+      <div class="login-avatar">🔐</div>
       <h1>ConvertAll Admin</h1>
-      <p>Connectez-vous pour accéder au panel d'administration</p>
-      <input type="password" class="login-input" id="loginPassword" placeholder="Mot de passe" autofocus>
+      <p>Connectez-vous pour accéder au panel</p>
+      <div class="input-group">
+        <span class="input-icon">🔑</span>
+        <input type="password" id="loginPassword" placeholder="Mot de passe" autofocus>
+      </div>
       <button class="login-btn" id="loginBtn">Se connecter</button>
-      <div class="login-error" id="loginError">Mot de passe incorrect</div>
+      <div class="login-error" id="loginError">❌ Mot de passe incorrect</div>
     </div>
   </div>
 
   <!-- DASHBOARD -->
   <div class="dashboard" id="dashboard">
-    <nav class="sidebar">
-      <div class="sidebar-logo">
-        <h2>ConvertAll</h2>
-        <span>Panel Admin</span>
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+      <button class="burger" id="burgerBtn">☰</button>
+      <span class="mobile-title">ConvertAll Admin</span>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">CA</div>
+          <div><h2>ConvertAll</h2><span>Panel Admin v2</span></div>
+        </div>
       </div>
-      <button class="nav-item active" data-section="overview"><span class="nav-icon">📊</span> Vue d'ensemble</button>
-      <button class="nav-item" data-section="history"><span class="nav-icon">📋</span> Historique</button>
-      <button class="nav-item" data-section="pages"><span class="nav-icon">📄</span> Pages du site</button>
-      <div class="nav-divider"></div>
-      <button class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span> Paramètres</button>
-      <button class="nav-item" data-section="links"><span class="nav-icon">🔗</span> Liens rapides</button>
-      <div class="nav-divider"></div>
-      <a class="nav-item" href="home.html"><span class="nav-icon">🌐</span> Voir le site</a>
+      <div class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <button class="nav-item active" data-section="overview"><span class="nav-icon">📊</span> Vue d'ensemble <span class="nav-badge" id="navConvCount">0</span></button>
+        <button class="nav-item" data-section="analytics"><span class="nav-icon">📈</span> Analytiques</button>
+        <button class="nav-item" data-section="history"><span class="nav-icon">📋</span> Historique</button>
+        <div class="nav-label">Gestion</div>
+        <button class="nav-item" data-section="pages"><span class="nav-icon">📄</span> Pages <span class="nav-badge">19</span></button>
+        <button class="nav-item" data-section="revenue"><span class="nav-icon">💰</span> Revenus</button>
+        <div class="nav-label">Système</div>
+        <button class="nav-item" data-section="settings"><span class="nav-icon">⚙️</span> Paramètres</button>
+        <button class="nav-item" data-section="links"><span class="nav-icon">🔗</span> Liens rapides</button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar">A</div>
+          <div>
+            <div class="user-name">Admin</div>
+            <div class="user-role">Administrateur</div>
+          </div>
+        </div>
+      </div>
     </nav>
 
+    <!-- Main -->
     <div class="main">
-      <div class="main-header">
-        <h1 id="sectionTitle">📊 Vue d'ensemble</h1>
-        <button class="logout-btn" id="logoutBtn">Déconnexion</button>
+      <div class="main-top">
+        <div>
+          <h1 id="sectionTitle">Vue d'ensemble</h1>
+          <p style="font-size:.82rem;color:var(--text2);margin-top:4px" id="welcomeMsg"></p>
+        </div>
+        <div class="main-top-right">
+          <div class="clock" id="clock">--:--:--</div>
+          <button class="refresh-btn" id="refreshBtn" title="Rafraîchir">🔄</button>
+          <button class="logout-btn" id="logoutBtn">Déconnexion</button>
+        </div>
       </div>
 
-      <!-- OVERVIEW -->
+      <!-- ====== OVERVIEW ====== -->
       <div class="panel-section active" id="sec-overview">
         <div class="stats-grid" id="statsGrid"></div>
-        <div class="panel">
-          <h3>📈 Outils les plus utilisés</h3>
-          <table class="table">
-            <thead><tr><th>Outil</th><th>Utilisations</th><th>Volume traité</th><th>Réduction moy.</th></tr></thead>
-            <tbody id="topToolsBody"></tbody>
-          </table>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>📈 Outils populaires</h3></div>
+            <div class="panel-body"><div class="chart-bars" id="toolChart"></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>📅 Activité (30 jours)</h3></div>
+            <div class="panel-body"><div class="activity-grid" id="activityGrid"></div><div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:.65rem;color:var(--text2)"><span>Moins</span><div class="activity-dot"></div><div class="activity-dot l1"></div><div class="activity-dot l2"></div><div class="activity-dot l3"></div><div class="activity-dot l4"></div><span>Plus</span></div></div>
+          </div>
         </div>
         <div class="panel">
-          <h3>🕐 Dernières conversions</h3>
-          <table class="table">
-            <thead><tr><th>Date</th><th>Action</th><th>Fichiers</th><th>Taille</th><th>Résultat</th></tr></thead>
-            <tbody id="recentBody"></tbody>
-          </table>
+          <div class="panel-head"><h3>🕐 Dernières conversions</h3></div>
+          <div class="panel-body"><div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Action</th><th>Fichiers</th><th>Taille</th><th>Résultat</th></tr></thead><tbody id="recentBody"></tbody></table></div></div>
         </div>
       </div>
 
-      <!-- HISTORY -->
+      <!-- ====== ANALYTICS ====== -->
+      <div class="panel-section" id="sec-analytics">
+        <div class="stats-grid" id="analyticsStats"></div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>🏆 Top outils</h3></div>
+            <div class="panel-body"><div class="table-wrap"><table class="table"><thead><tr><th>Outil</th><th>Utilisations</th><th>Volume</th><th>Réduction</th></tr></thead><tbody id="topToolsBody"></tbody></table></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>📊 Formats de sortie</h3></div>
+            <div class="panel-body"><div class="chart-bars" id="formatChart"></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>💾 Stockage localStorage</h3></div>
+          <div class="panel-body">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+              <div style="flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden"><div id="storageBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s"></div></div>
+              <span id="storageText" style="font-size:.78rem;color:var(--text2);white-space:nowrap"></span>
+            </div>
+            <div id="storageDetails" style="font-size:.76rem;color:var(--text2)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== HISTORY ====== -->
       <div class="panel-section" id="sec-history">
         <div class="panel">
-          <h3>📋 Historique complet <span style="font-weight:400;font-size:.76rem;color:var(--text2)" id="historyCount"></span></h3>
-          <table class="table">
-            <thead><tr><th>Date</th><th>Heure</th><th>Action</th><th>Fichiers</th><th>Entrée</th><th>Sortie</th><th>Réduction</th></tr></thead>
-            <tbody id="fullHistoryBody"></tbody>
-          </table>
-          <div style="margin-top:16px;display:flex;gap:8px">
-            <button class="setting-btn" id="exportHistoryBtn">📥 Exporter CSV</button>
-            <button class="setting-btn danger" id="clearHistoryBtn">🗑️ Vider l'historique</button>
+          <div class="panel-head">
+            <h3>📋 Historique complet <span style="font-weight:400;font-size:.74rem;color:var(--text2)" id="historyCount"></span></h3>
+            <div class="ph-actions">
+              <button class="btn btn-ghost" id="exportHistoryBtn">📥 CSV</button>
+              <button class="btn btn-danger" id="clearHistoryBtn">🗑️ Vider</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="search-bar"><input class="search-input" id="historySearch" placeholder="Rechercher dans l'historique..."></div>
+            <div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Heure</th><th>Action</th><th>Fichiers</th><th>Entrée</th><th>Sortie</th><th>Réduction</th></tr></thead><tbody id="fullHistoryBody"></tbody></table></div>
           </div>
         </div>
       </div>
 
-      <!-- PAGES -->
+      <!-- ====== PAGES ====== -->
       <div class="panel-section" id="sec-pages">
         <div class="panel">
-          <h3>📄 Toutes les pages de ton site</h3>
-          <div id="pagesList"></div>
+          <div class="panel-head"><h3>📄 Pages du site (19)</h3></div>
+          <div class="panel-body"><div id="pagesList"></div></div>
         </div>
       </div>
 
-      <!-- SETTINGS -->
+      <!-- ====== REVENUE ====== -->
+      <div class="panel-section" id="sec-revenue">
+        <div class="stats-grid" id="revenueStats"></div>
+        <div class="panel">
+          <div class="panel-head"><h3>💡 Comment augmenter tes revenus</h3></div>
+          <div class="panel-body">
+            <div id="revenueTips" style="font-size:.84rem;line-height:1.8"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SETTINGS ====== -->
       <div class="panel-section" id="sec-settings">
         <div class="panel">
-          <h3>⚙️ Paramètres du site</h3>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Mot de passe admin</div>
-              <div class="setting-desc">Changez le mot de passe du panel admin</div>
-            </div>
-            <div style="display:flex;gap:8px">
-              <input type="password" class="setting-input" id="newPassword" placeholder="Nouveau mot de passe">
-              <button class="setting-btn" id="changePassBtn">Changer</button>
-            </div>
-          </div>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Thème par défaut</div>
-              <div class="setting-desc">Thème affiché aux nouveaux visiteurs</div>
-            </div>
-            <select class="setting-input" id="defaultTheme" style="width:120px">
-              <option value="dark">Sombre</option>
-              <option value="light">Clair</option>
-            </select>
-          </div>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Langue par défaut</div>
-              <div class="setting-desc">Langue affichée aux nouveaux visiteurs</div>
-            </div>
-            <select class="setting-input" id="defaultLang" style="width:120px">
-              <option value="fr">Français</option>
-              <option value="en">English</option>
-            </select>
-          </div>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Interstitial pub</div>
-              <div class="setting-desc">Afficher la pub interstitiale toutes les X conversions</div>
-            </div>
-            <select class="setting-input" id="interstitialFreq" style="width:120px">
-              <option value="2">Toutes les 2</option>
-              <option value="3">Toutes les 3</option>
-              <option value="5">Toutes les 5</option>
-              <option value="0">Désactivé</option>
-            </select>
-          </div>
-          <div style="margin-top:16px">
-            <button class="setting-btn" id="saveSettingsBtn">💾 Sauvegarder les paramètres</button>
+          <div class="panel-head"><h3>⚙️ Paramètres</h3></div>
+          <div class="panel-body">
+            <div class="setting-row"><div><div class="setting-label">Mot de passe admin</div><div class="setting-desc">Changez le mot de passe du panel</div></div><div style="display:flex;gap:8px"><input type="password" class="setting-input" id="newPassword" placeholder="Nouveau mot de passe"><button class="btn btn-primary" id="changePassBtn">Changer</button></div></div>
+            <div class="setting-row"><div><div class="setting-label">Thème par défaut</div><div class="setting-desc">Thème pour les nouveaux visiteurs</div></div><select class="setting-input" id="defaultTheme"><option value="dark">Sombre</option><option value="light">Clair</option></select></div>
+            <div class="setting-row"><div><div class="setting-label">Langue par défaut</div><div class="setting-desc">Langue pour les nouveaux visiteurs</div></div><select class="setting-input" id="defaultLang"><option value="fr">Français</option><option value="en">English</option></select></div>
+            <div class="setting-row"><div><div class="setting-label">Fréquence interstitial</div><div class="setting-desc">Pub interstitiale toutes les X conversions</div></div><select class="setting-input" id="interstitialFreq"><option value="2">Toutes les 2</option><option value="3">Toutes les 3</option><option value="5">Toutes les 5</option><option value="0">Désactivé</option></select></div>
+            <div style="margin-top:16px"><button class="btn btn-primary" id="saveSettingsBtn">💾 Sauvegarder</button></div>
           </div>
         </div>
         <div class="panel">
-          <h3>🔑 Identifiants</h3>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Google AdSense</div>
-              <div class="setting-desc">ca-pub-3295055468386254</div>
-            </div>
-            <a href="https://adsense.google.com" target="_blank" class="setting-btn">Ouvrir AdSense</a>
-          </div>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Google Analytics</div>
-              <div class="setting-desc">G-8L84FD542X</div>
-            </div>
-            <a href="https://analytics.google.com" target="_blank" class="setting-btn">Ouvrir Analytics</a>
+          <div class="panel-head"><h3>🔑 Identifiants & Services</h3></div>
+          <div class="panel-body">
+            <div class="setting-row"><div><div class="setting-label">Google AdSense</div><div class="setting-desc" style="font-family:monospace">ca-pub-3295055468386254</div></div><a href="https://adsense.google.com" target="_blank" class="btn btn-primary">Ouvrir</a></div>
+            <div class="setting-row"><div><div class="setting-label">Google Analytics</div><div class="setting-desc" style="font-family:monospace">G-8L84FD542X</div></div><a href="https://analytics.google.com" target="_blank" class="btn btn-primary">Ouvrir</a></div>
+            <div class="setting-row"><div><div class="setting-label">GitHub Repository</div><div class="setting-desc" style="font-family:monospace">convertall-app.github.io</div></div><a href="https://github.com/convertall-app/convertall-app.github.io" target="_blank" class="btn btn-primary">Ouvrir</a></div>
           </div>
         </div>
       </div>
 
-      <!-- LINKS -->
+      <!-- ====== LINKS ====== -->
       <div class="panel-section" id="sec-links">
-        <div class="quick-links">
-          <a href="https://analytics.google.com" target="_blank" class="quick-link">
-            <div class="ql-icon">📊</div>
-            <div><div class="ql-title">Google Analytics</div><div class="ql-desc">Voir les visiteurs, pages vues, pays</div></div>
-          </a>
-          <a href="https://adsense.google.com" target="_blank" class="quick-link">
-            <div class="ql-icon">💰</div>
-            <div><div class="ql-title">Google AdSense</div><div class="ql-desc">Voir les revenus, clics, impressions</div></div>
-          </a>
-          <a href="https://search.google.com/search-console" target="_blank" class="quick-link">
-            <div class="ql-icon">🔍</div>
-            <div><div class="ql-title">Google Search Console</div><div class="ql-desc">SEO, mots-clés, indexation</div></div>
-          </a>
-          <a href="https://github.com/convertall-app/convertall-app.github.io" target="_blank" class="quick-link">
-            <div class="ql-icon">🐙</div>
-            <div><div class="ql-title">GitHub Repository</div><div class="ql-desc">Code source, déploiement</div></div>
-          </a>
-          <a href="https://pagespeed.web.dev/" target="_blank" class="quick-link">
-            <div class="ql-icon">⚡</div>
-            <div><div class="ql-title">PageSpeed Insights</div><div class="ql-desc">Tester la vitesse du site</div></div>
-          </a>
-          <a href="home.html" class="quick-link">
-            <div class="ql-icon">🌐</div>
-            <div><div class="ql-title">Voir le site</div><div class="ql-desc">Ouvrir ConvertAll en tant que visiteur</div></div>
-          </a>
-        </div>
+        <div class="quick-links" id="quickLinks"></div>
       </div>
-
     </div>
   </div>
 
+  <div class="toast-c" id="toastC"></div>
+
   <script>
+    // ===================== HELPERS =====================
+    function $(s) { return document.querySelector(s); }
+    function $$(s) { return document.querySelectorAll(s); }
+    function fmtSize(b) { if (!b || b <= 0) return '0 o'; if (b < 1024) return b + ' o'; if (b < 1048576) return (b / 1024).toFixed(1) + ' Ko'; return (b / 1048576).toFixed(2) + ' Mo'; }
+    function toast(msg, type='info') {
+      const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+      $('#toastC').appendChild(t); setTimeout(() => t.remove(), 3000);
+    }
+    function getHistory() { try { return JSON.parse(localStorage.getItem('convertall-history') || '[]'); } catch { return []; } }
+
+    const ACTION_LABELS = {
+      convert:'Conversion image', resize:'Redimensionnement', compress:'Compression', crop:'Recadrage', rotate:'Rotation',
+      favicon:'Favicon', qrcode:'QR Code', colorpicker:'Pipette', base64:'Base64',
+      removebg:'Suppr. fond', exif:'Suppr. EXIF', txt2img:'Texte → Image', ascii:'ASCII Art',
+      'images-to-pdf':'Images → PDF', 'merge-pdf':'Fusion PDF', 'split-pdf':'Extraction PDF', 'compress-pdf':'Compr. PDF',
+      media:'Conv. média', 'QR Code':'QR Code',
+    };
+    function getActionLabel(item) {
+      const key = item.tool || (item.type && item.type.includes('/') ? item.type.split('/')[1] : item.type) || '?';
+      return ACTION_LABELS[key] || key;
+    }
+
     // ===================== AUTH =====================
     const DEFAULT_PASS = 'admin123';
     function getPass() { return localStorage.getItem('convertall-admin-pass') || DEFAULT_PASS; }
 
     function login() {
-      const input = document.getElementById('loginPassword').value;
+      const input = $('#loginPassword').value;
       if (input === getPass()) {
         sessionStorage.setItem('convertall-admin-auth', '1');
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        loadDashboard();
+        $('#loginScreen').style.display = 'none';
+        $('#dashboard').style.display = 'block';
+        initDashboard();
       } else {
-        document.getElementById('loginError').style.display = 'block';
+        $('#loginError').style.display = 'block';
+        $('#loginPassword').style.borderColor = 'var(--red)';
+        setTimeout(() => { $('#loginPassword').style.borderColor = ''; }, 1500);
       }
     }
+    $('#loginBtn').addEventListener('click', login);
+    $('#loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+    $('#logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('convertall-admin-auth'); location.reload(); });
 
-    document.getElementById('loginBtn').addEventListener('click', login);
-    document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      sessionStorage.removeItem('convertall-admin-auth');
-      location.reload();
-    });
-
-    // Auto-login if already authenticated
     if (sessionStorage.getItem('convertall-admin-auth') === '1') {
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      setTimeout(loadDashboard, 50);
+      $('#loginScreen').style.display = 'none';
+      $('#dashboard').style.display = 'block';
+      setTimeout(initDashboard, 50);
     }
 
-    // ===================== NAVIGATION =====================
-    const SECTION_TITLES = {
-      overview: '📊 Vue d\'ensemble',
-      history: '📋 Historique',
-      pages: '📄 Pages du site',
-      settings: '⚙️ Paramètres',
-      links: '🔗 Liens rapides',
-    };
+    // ===================== MOBILE =====================
+    $('#burgerBtn').addEventListener('click', () => { $('#sidebar').classList.toggle('open'); $('#overlay').classList.toggle('open'); });
+    $('#overlay').addEventListener('click', () => { $('#sidebar').classList.remove('open'); $('#overlay').classList.remove('open'); });
 
-    document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
+    // ===================== NAV =====================
+    const SECTION_TITLES = { overview:'Vue d\'ensemble', analytics:'Analytiques', history:'Historique', pages:'Pages du site', revenue:'Revenus', settings:'Paramètres', links:'Liens rapides' };
+    $$('.nav-item[data-section]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        $$('.nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         const sec = btn.dataset.section;
-        document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
-        document.getElementById('sec-' + sec).classList.add('active');
-        document.getElementById('sectionTitle').textContent = SECTION_TITLES[sec] || sec;
+        $$('.panel-section').forEach(s => s.classList.remove('active'));
+        $('#sec-' + sec).classList.add('active');
+        $('#sectionTitle').textContent = SECTION_TITLES[sec] || sec;
+        $('#sidebar').classList.remove('open'); $('#overlay').classList.remove('open');
       });
     });
 
-    // ===================== DATA =====================
-    function getHistory() { try { return JSON.parse(localStorage.getItem('convertall-history') || '[]'); } catch { return []; } }
-    function fmtSize(b) { if (!b || b <= 0) return '0 o'; if (b < 1024) return b + ' o'; if (b < 1048576) return (b / 1024).toFixed(1) + ' Ko'; return (b / 1048576).toFixed(2) + ' Mo'; }
-
-    const ACTION_LABELS = {
-      convert:'Conversion image', resize:'Redimensionnement', compress:'Compression image', crop:'Recadrage', rotate:'Rotation',
-      favicon:'Favicon', qrcode:'QR Code', colorpicker:'Pipette', base64:'Base64',
-      removebg:'Suppr. fond', exif:'Suppr. EXIF', txt2img:'Texte → Image', ascii:'ASCII Art',
-      'images-to-pdf':'Images → PDF', 'merge-pdf':'Fusion PDF', 'split-pdf':'Extraction PDF', 'compress-pdf':'Compression PDF',
-      media:'Conversion média', 'QR Code':'QR Code',
-    };
+    // ===================== CLOCK =====================
+    function updateClock() {
+      const now = new Date();
+      $('#clock').textContent = now.toLocaleTimeString('fr-FR');
+    }
+    setInterval(updateClock, 1000);
 
     // ===================== DASHBOARD =====================
-    function loadDashboard() {
-      const h = getHistory();
+    function initDashboard() {
+      updateClock();
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
+      $('#welcomeMsg').textContent = greeting + ' ! Voici le résumé de ton site.';
+      loadOverview();
+      loadAnalytics();
+      loadFullHistory();
+      loadPages();
+      loadRevenue();
+      loadLinks();
+      loadSettings();
+    }
 
-      // Stats cards
-      const totalConversions = h.length;
+    $('#refreshBtn').addEventListener('click', () => { initDashboard(); toast('Données rafraîchies', 'success'); });
+
+    // ===================== OVERVIEW =====================
+    function loadOverview() {
+      const h = getHistory();
+      const total = h.length;
       const totalInput = h.reduce((s, i) => s + (i.inputSize || 0), 0);
       const totalOutput = h.reduce((s, i) => s + (i.outputSize || 0), 0);
-      const totalSaved = totalInput - totalOutput;
+      const saved = totalInput - totalOutput;
       const uniqueTools = [...new Set(h.map(i => i.tool || i.type))].length;
+      const totalFiles = h.reduce((s, i) => s + (i.fileCount || i.files || 1), 0);
+      const avgSize = total > 0 ? totalInput / total : 0;
 
-      document.getElementById('statsGrid').innerHTML = `
-        <div class="stat-card accent"><div class="stat-label">Total conversions</div><div class="stat-value">${totalConversions}</div><div class="stat-sub">depuis le début</div></div>
-        <div class="stat-card green"><div class="stat-label">Volume traité</div><div class="stat-value">${fmtSize(totalInput)}</div><div class="stat-sub">en entrée</div></div>
-        <div class="stat-card orange"><div class="stat-label">Espace économisé</div><div class="stat-value">${totalSaved > 0 ? fmtSize(totalSaved) : '0 o'}</div><div class="stat-sub">${totalInput > 0 ? Math.round((totalSaved / totalInput) * 100) : 0}% de réduction</div></div>
-        <div class="stat-card"><div class="stat-label">Outils utilisés</div><div class="stat-value">${uniqueTools}</div><div class="stat-sub">outils différents</div></div>
+      $('#navConvCount').textContent = total;
+
+      $('#statsGrid').innerHTML = `
+        <div class="stat-card c-accent"><div class="sc-top"><span class="sc-label">Conversions</span><div class="sc-icon">⚡</div></div><div class="sc-value">${total}</div><div class="sc-sub">total depuis le début</div></div>
+        <div class="stat-card c-green"><div class="sc-top"><span class="sc-label">Fichiers traités</span><div class="sc-icon">📁</div></div><div class="sc-value">${totalFiles}</div><div class="sc-sub">${fmtSize(totalInput)} traités</div></div>
+        <div class="stat-card c-orange"><div class="sc-top"><span class="sc-label">Espace économisé</span><div class="sc-icon">💾</div></div><div class="sc-value">${saved > 0 ? fmtSize(saved) : '0 o'}</div><div class="sc-sub">${totalInput > 0 ? Math.round((saved / totalInput) * 100) : 0}% de réduction</div></div>
+        <div class="stat-card c-cyan"><div class="sc-top"><span class="sc-label">Outils utilisés</span><div class="sc-icon">🔧</div></div><div class="sc-value">${uniqueTools}</div><div class="sc-sub">outils différents</div></div>
+        <div class="stat-card c-pink"><div class="sc-top"><span class="sc-label">Taille moyenne</span><div class="sc-icon">📊</div></div><div class="sc-value">${fmtSize(avgSize)}</div><div class="sc-sub">par conversion</div></div>
+        <div class="stat-card c-red"><div class="sc-top"><span class="sc-label">Pubs estimées</span><div class="sc-icon">💰</div></div><div class="sc-value">${Math.floor(total / 2)}</div><div class="sc-sub">interstitials affichés</div></div>
       `;
 
-      // Top tools
+      // Tool chart
       const toolCounts = {};
       h.forEach(item => {
-        const key = item.tool || item.type.split('/')[1] || item.type;
+        const key = getActionLabel(item);
+        toolCounts[key] = (toolCounts[key] || 0) + 1;
+      });
+      const sorted = Object.entries(toolCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      const maxCount = sorted.length ? sorted[0][1] : 1;
+      $('#toolChart').innerHTML = sorted.map(([name, count]) =>
+        `<div class="chart-bar"><div class="cb-value">${count}</div><div class="cb-fill" style="height:${Math.max(5, (count / maxCount) * 100)}%"></div><div class="cb-label">${name}</div></div>`
+      ).join('') || '<div style="color:var(--text2);font-size:.82rem;padding:20px;text-align:center">Aucune donnée</div>';
+
+      // Activity grid (30 days)
+      const now = new Date();
+      const days = {};
+      h.forEach(item => {
+        const d = new Date(item.date);
+        const key = d.toISOString().slice(0, 10);
+        days[key] = (days[key] || 0) + 1;
+      });
+      let activityHtml = '';
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(now); d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const count = days[key] || 0;
+        const level = count === 0 ? '' : count <= 2 ? 'l1' : count <= 5 ? 'l2' : count <= 10 ? 'l3' : 'l4';
+        activityHtml += `<div class="activity-dot ${level}" title="${key}: ${count} conv."></div>`;
+      }
+      $('#activityGrid').innerHTML = activityHtml;
+
+      // Recent
+      const recent = h.slice(-8).reverse();
+      $('#recentBody').innerHTML = recent.map(item => {
+        const d = new Date(item.date);
+        const files = item.fileNames ? item.fileNames.join(', ') : (item.fileCount || item.files || 1) + ' fichier(s)';
+        const reduction = item.inputSize > 0 && item.outputSize < item.inputSize ? Math.round((1 - item.outputSize / item.inputSize) * 100) : 0;
+        return `<tr><td>${d.toLocaleDateString()}</td><td><strong>${getActionLabel(item)}</strong></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${files}">${files}</td><td>${fmtSize(item.inputSize)} → ${fmtSize(item.outputSize)}</td><td>${reduction > 0 ? `<span class="badge green">-${reduction}%</span>` : '<span class="badge blue">OK</span>'}</td></tr>`;
+      }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:20px">Aucune conversion</td></tr>';
+    }
+
+    // ===================== ANALYTICS =====================
+    function loadAnalytics() {
+      const h = getHistory();
+      const today = new Date().toISOString().slice(0, 10);
+      const todayCount = h.filter(i => i.date && i.date.startsWith(today)).length;
+      const week = new Date(); week.setDate(week.getDate() - 7);
+      const weekCount = h.filter(i => new Date(i.date) >= week).length;
+      const mostUsedTool = (() => { const c = {}; h.forEach(i => { const k = getActionLabel(i); c[k] = (c[k] || 0) + 1; }); return Object.entries(c).sort((a, b) => b[1] - a[1])[0]; })();
+      const mostUsedFormat = (() => { const c = {}; h.forEach(i => { if (i.format) c[i.format] = (c[i.format] || 0) + 1; }); return Object.entries(c).sort((a, b) => b[1] - a[1])[0]; })();
+
+      $('#analyticsStats').innerHTML = `
+        <div class="stat-card c-accent"><div class="sc-top"><span class="sc-label">Aujourd'hui</span><div class="sc-icon">📅</div></div><div class="sc-value">${todayCount}</div><div class="sc-sub">conversions</div></div>
+        <div class="stat-card c-green"><div class="sc-top"><span class="sc-label">Cette semaine</span><div class="sc-icon">📊</div></div><div class="sc-value">${weekCount}</div><div class="sc-sub">7 derniers jours</div></div>
+        <div class="stat-card c-pink"><div class="sc-top"><span class="sc-label">Outil #1</span><div class="sc-icon">🏆</div></div><div class="sc-value" style="font-size:1.1rem">${mostUsedTool ? mostUsedTool[0] : '—'}</div><div class="sc-sub">${mostUsedTool ? mostUsedTool[1] + ' fois' : 'aucun'}</div></div>
+        <div class="stat-card c-cyan"><div class="sc-top"><span class="sc-label">Format #1</span><div class="sc-icon">📁</div></div><div class="sc-value" style="font-size:1.1rem">${mostUsedFormat ? mostUsedFormat[0].toUpperCase() : '—'}</div><div class="sc-sub">${mostUsedFormat ? mostUsedFormat[1] + ' fois' : 'aucun'}</div></div>
+      `;
+
+      // Top tools table
+      const toolCounts = {};
+      h.forEach(item => {
+        const key = getActionLabel(item);
         if (!toolCounts[key]) toolCounts[key] = { count: 0, input: 0, output: 0 };
         toolCounts[key].count++;
         toolCounts[key].input += item.inputSize || 0;
         toolCounts[key].output += item.outputSize || 0;
       });
       const sorted = Object.entries(toolCounts).sort((a, b) => b[1].count - a[1].count);
-      document.getElementById('topToolsBody').innerHTML = sorted.map(([key, data]) => {
+      $('#topToolsBody').innerHTML = sorted.map(([key, data]) => {
         const reduction = data.input > 0 ? Math.round((1 - data.output / data.input) * 100) : 0;
-        return `<tr>
-          <td><strong>${ACTION_LABELS[key] || key}</strong></td>
-          <td>${data.count}</td>
-          <td>${fmtSize(data.input)}</td>
-          <td>${reduction > 0 ? `<span class="badge green">-${reduction}%</span>` : '<span class="badge blue">—</span>'}</td>
-        </tr>`;
-      }).join('');
+        return `<tr><td><strong>${key}</strong></td><td>${data.count}</td><td>${fmtSize(data.input)}</td><td>${reduction > 0 ? `<span class="badge green">-${reduction}%</span>` : '<span class="badge blue">—</span>'}</td></tr>`;
+      }).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text2)">Aucune donnée</td></tr>';
 
-      // Recent conversions
-      const recent = h.slice(-10).reverse();
-      document.getElementById('recentBody').innerHTML = recent.map(item => {
-        const d = new Date(item.date);
-        const key = item.tool || item.type.split('/')[1] || item.type;
-        const files = item.fileNames ? item.fileNames.join(', ') : (item.fileCount || item.files || 1) + ' fichier(s)';
-        const reduction = item.inputSize > 0 && item.outputSize < item.inputSize ? Math.round((1 - item.outputSize / item.inputSize) * 100) : 0;
-        return `<tr>
-          <td>${d.toLocaleDateString()} ${d.toLocaleTimeString()}</td>
-          <td>${ACTION_LABELS[key] || key}</td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${files}">${files}</td>
-          <td>${fmtSize(item.inputSize)} → ${fmtSize(item.outputSize)}</td>
-          <td>${reduction > 0 ? `<span class="badge green">-${reduction}%</span>` : '<span class="badge blue">OK</span>'}</td>
-        </tr>`;
-      }).join('');
+      // Format chart
+      const fmtCounts = {};
+      h.forEach(i => { if (i.format) fmtCounts[i.format] = (fmtCounts[i.format] || 0) + 1; });
+      const fmtSorted = Object.entries(fmtCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      const fmtMax = fmtSorted.length ? fmtSorted[0][1] : 1;
+      $('#formatChart').innerHTML = fmtSorted.map(([name, count]) =>
+        `<div class="chart-bar"><div class="cb-value">${count}</div><div class="cb-fill" style="height:${Math.max(5, (count / fmtMax) * 100)}%"></div><div class="cb-label">${name.toUpperCase()}</div></div>`
+      ).join('') || '<div style="color:var(--text2);font-size:.82rem;padding:20px;text-align:center">Aucune donnée</div>';
 
-      // Full history
-      loadFullHistory();
-      loadPages();
-      loadSettings();
+      // Storage
+      let totalStorage = 0;
+      const details = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const size = (localStorage.getItem(key) || '').length * 2;
+        totalStorage += size;
+        if (key.startsWith('convertall')) details.push({ key, size });
+      }
+      const maxStorage = 5 * 1024 * 1024;
+      const pct = Math.min(100, (totalStorage / maxStorage) * 100);
+      $('#storageBar').style.width = pct + '%';
+      $('#storageText').textContent = fmtSize(totalStorage) + ' / 5 Mo';
+      $('#storageDetails').innerHTML = details.sort((a, b) => b.size - a.size).map(d =>
+        `<div style="display:flex;justify-content:space-between;padding:2px 0"><span style="font-family:monospace">${d.key}</span><span>${fmtSize(d.size)}</span></div>`
+      ).join('');
     }
 
-    function loadFullHistory() {
+    // ===================== HISTORY =====================
+    function loadFullHistory(filter = '') {
       const h = getHistory().reverse();
-      document.getElementById('historyCount').textContent = `(${h.length} entrées)`;
-      document.getElementById('fullHistoryBody').innerHTML = h.map(item => {
+      const filtered = filter ? h.filter(item => {
+        const label = getActionLabel(item).toLowerCase();
+        const files = (item.fileNames || []).join(' ').toLowerCase();
+        return label.includes(filter) || files.includes(filter);
+      }) : h;
+      $('#historyCount').textContent = `(${filtered.length}/${h.length})`;
+      $('#fullHistoryBody').innerHTML = filtered.map(item => {
         const d = new Date(item.date);
-        const key = item.tool || item.type.split('/')[1] || item.type;
         const files = item.fileNames ? item.fileNames.join(', ') : (item.fileCount || item.files || 1) + ' fichier(s)';
         const reduction = item.inputSize > 0 && item.outputSize < item.inputSize ? Math.round((1 - item.outputSize / item.inputSize) * 100) : 0;
-        return `<tr>
-          <td>${d.toLocaleDateString()}</td>
-          <td>${d.toLocaleTimeString()}</td>
-          <td>${ACTION_LABELS[key] || key}</td>
-          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${files}">${files}</td>
-          <td>${fmtSize(item.inputSize)}</td>
-          <td>${fmtSize(item.outputSize)}</td>
-          <td>${reduction > 0 ? `<span class="badge green">-${reduction}%</span>` : '—'}</td>
-        </tr>`;
-      }).join('');
+        return `<tr><td>${d.toLocaleDateString()}</td><td>${d.toLocaleTimeString()}</td><td><strong>${getActionLabel(item)}</strong></td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${files}">${files}</td><td>${fmtSize(item.inputSize)}</td><td>${fmtSize(item.outputSize)}</td><td>${reduction > 0 ? `<span class="badge green">-${reduction}%</span>` : '—'}</td></tr>`;
+      }).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:20px">Aucune entrée</td></tr>';
     }
+
+    let searchTimeout;
+    $('#historySearch').addEventListener('input', e => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => loadFullHistory(e.target.value.toLowerCase()), 200);
+    });
 
     // ===================== PAGES =====================
     function loadPages() {
       const pages = [
-        { icon: '🏠', name: 'Homepage', url: 'home.html' },
-        { icon: '⚡', name: 'App Complète', url: 'index.html' },
-        { icon: '🔄', name: 'Convertir Image', url: 'convert-image.html' },
-        { icon: '↔️', name: 'Redimensionner Image', url: 'resize-image.html' },
-        { icon: '📦', name: 'Compresser Image', url: 'compress-image.html' },
-        { icon: '✂️', name: 'Recadrer Image', url: 'crop-image.html' },
-        { icon: '🔃', name: 'Pivoter Image', url: 'rotate-image.html' },
-        { icon: '⭐', name: 'Favicon Generator', url: 'favicon-generator.html' },
-        { icon: '📦', name: 'Compresser PDF', url: 'compress-pdf.html' },
-        { icon: '📎', name: 'Fusionner PDF', url: 'merge-pdf.html' },
-        { icon: '✂️', name: 'Extraire Pages PDF', url: 'split-pdf.html' },
-        { icon: '🖼️', name: 'Images → PDF', url: 'images-to-pdf.html' },
-        { icon: '📱', name: 'QR Code Generator', url: 'qr-code-generator.html' },
-        { icon: '🎨', name: 'Pipette Couleur', url: 'color-picker.html' },
-        { icon: '🔤', name: 'Base64 Converter', url: 'base64-converter.html' },
-        { icon: '🖼️', name: 'Supprimer Fond', url: 'remove-background.html' },
-        { icon: '🔒', name: 'Supprimer EXIF', url: 'remove-exif.html' },
-        { icon: '🔠', name: 'Texte → Image', url: 'text-to-image.html' },
-        { icon: '🎭', name: 'ASCII Art', url: 'ascii-art.html' },
+        { icon:'🏠', name:'Homepage', url:'home.html', cat:'Principal' },
+        { icon:'⚡', name:'App Complète', url:'index.html', cat:'Principal' },
+        { icon:'🔄', name:'Convertir Image', url:'convert-image.html', cat:'Images' },
+        { icon:'↔️', name:'Redimensionner', url:'resize-image.html', cat:'Images' },
+        { icon:'📦', name:'Compresser Image', url:'compress-image.html', cat:'Images' },
+        { icon:'✂️', name:'Recadrer', url:'crop-image.html', cat:'Images' },
+        { icon:'🔃', name:'Pivoter', url:'rotate-image.html', cat:'Images' },
+        { icon:'⭐', name:'Favicon', url:'favicon-generator.html', cat:'Images' },
+        { icon:'📦', name:'Compresser PDF', url:'compress-pdf.html', cat:'PDF' },
+        { icon:'📎', name:'Fusionner PDF', url:'merge-pdf.html', cat:'PDF' },
+        { icon:'✂️', name:'Extraire Pages', url:'split-pdf.html', cat:'PDF' },
+        { icon:'🖼️', name:'Images → PDF', url:'images-to-pdf.html', cat:'PDF' },
+        { icon:'📱', name:'QR Code', url:'qr-code-generator.html', cat:'Outils' },
+        { icon:'🎨', name:'Pipette', url:'color-picker.html', cat:'Outils' },
+        { icon:'🔤', name:'Base64', url:'base64-converter.html', cat:'Outils' },
+        { icon:'🖼️', name:'Suppr. Fond', url:'remove-background.html', cat:'Outils' },
+        { icon:'🔒', name:'Suppr. EXIF', url:'remove-exif.html', cat:'Outils' },
+        { icon:'🔠', name:'Texte → Image', url:'text-to-image.html', cat:'Outils' },
+        { icon:'🎭', name:'ASCII Art', url:'ascii-art.html', cat:'Outils' },
       ];
-
-      document.getElementById('pagesList').innerHTML = pages.map(p => `
+      const base = 'https://convertall-app.github.io/';
+      $('#pagesList').innerHTML = pages.map(p => `
         <div class="page-item">
           <div class="page-icon">${p.icon}</div>
-          <div class="page-info">
-            <div class="page-name">${p.name}</div>
-            <div class="page-url">convertall-app.github.io/${p.url}</div>
+          <div class="page-info"><div class="page-name">${p.name}</div><div class="page-url">${base}${p.url}</div></div>
+          <div class="page-actions">
+            <span class="badge ${p.cat==='Principal'?'blue':p.cat==='Images'?'green':p.cat==='PDF'?'orange':'cyan'}">${p.cat}</span>
+            <button class="btn-sm" onclick="navigator.clipboard.writeText('${base}${p.url}');toast('Lien copié !','success')">📋</button>
+            <a href="${p.url}" target="_blank" class="btn-sm primary">Ouvrir</a>
           </div>
-          <a href="${p.url}" target="_blank" class="page-link">Ouvrir</a>
         </div>
+      `).join('');
+    }
+
+    // ===================== REVENUE =====================
+    function loadRevenue() {
+      const h = getHistory();
+      const interstitials = Math.floor(h.length / 2);
+      const bannerImpressions = h.length * 2;
+      const estRevenueLow = ((interstitials * 5 + bannerImpressions * 1) / 1000).toFixed(2);
+      const estRevenueHigh = ((interstitials * 8 + bannerImpressions * 3) / 1000).toFixed(2);
+
+      $('#revenueStats').innerHTML = `
+        <div class="stat-card c-green"><div class="sc-top"><span class="sc-label">Bannières affichées</span><div class="sc-icon">📢</div></div><div class="sc-value">${bannerImpressions}</div><div class="sc-sub">2 par conversion</div></div>
+        <div class="stat-card c-orange"><div class="sc-top"><span class="sc-label">Interstitials</span><div class="sc-icon">📺</div></div><div class="sc-value">${interstitials}</div><div class="sc-sub">1 toutes les 2 conversions</div></div>
+        <div class="stat-card c-accent"><div class="sc-top"><span class="sc-label">Revenu estimé</span><div class="sc-icon">💰</div></div><div class="sc-value">${estRevenueLow}€ - ${estRevenueHigh}€</div><div class="sc-sub">basé sur tes conversions locales</div></div>
+        <div class="stat-card c-pink"><div class="sc-top"><span class="sc-label">CPM moyen</span><div class="sc-icon">📊</div></div><div class="sc-value">1-5€</div><div class="sc-sub">niche outils/tech</div></div>
+      `;
+
+      $('#revenueTips').innerHTML = `
+        <p>💡 <strong>Astuce 1 :</strong> Partage tes liens sur Reddit (r/free, r/tools), Twitter et les forums tech. Le trafic organique est le plus rentable.</p>
+        <p>💡 <strong>Astuce 2 :</strong> Active les <strong>Auto Ads</strong> dans AdSense → Google place les pubs automatiquement aux meilleurs endroits.</p>
+        <p>💡 <strong>Astuce 3 :</strong> Soumets ton site sur <strong>Google Search Console</strong> pour être indexé plus vite sur Google.</p>
+        <p>💡 <strong>Astuce 4 :</strong> Crée du contenu autour de tes outils : un blog "Comment compresser un PDF" ramène du trafic SEO gratuit.</p>
+        <p>💡 <strong>Astuce 5 :</strong> Les visiteurs de France, USA, UK rapportent 3-5x plus que les autres pays. Cible ces marchés.</p>
+        <p>💡 <strong>Astuce 6 :</strong> Poste sur <strong>ProductHunt</strong> et <strong>AlternativeTo</strong> pour un boost de trafic initial.</p>
+      `;
+    }
+
+    // ===================== LINKS =====================
+    function loadLinks() {
+      const links = [
+        { icon:'📊', title:'Google Analytics', desc:'Visiteurs, pages vues, pays', url:'https://analytics.google.com' },
+        { icon:'💰', title:'Google AdSense', desc:'Revenus, clics, impressions', url:'https://adsense.google.com' },
+        { icon:'🔍', title:'Search Console', desc:'SEO, indexation, mots-clés', url:'https://search.google.com/search-console' },
+        { icon:'🐙', title:'GitHub', desc:'Code source, déploiement', url:'https://github.com/convertall-app/convertall-app.github.io' },
+        { icon:'⚡', title:'PageSpeed', desc:'Tester la vitesse du site', url:'https://pagespeed.web.dev/' },
+        { icon:'🌐', title:'Voir le site', desc:'Ouvrir en tant que visiteur', url:'home.html' },
+        { icon:'🔎', title:'Test SEO', desc:'Vérifier le référencement', url:'https://www.seobility.net/en/seocheck/' },
+        { icon:'📱', title:'Mobile Test', desc:'Test responsive Google', url:'https://search.google.com/test/mobile-friendly' },
+      ];
+      $('#quickLinks').innerHTML = links.map(l => `
+        <a href="${l.url}" target="_blank" class="quick-link">
+          <div class="ql-icon">${l.icon}</div>
+          <div><div class="ql-title">${l.title}</div><div class="ql-desc">${l.desc}</div></div>
+        </a>
       `).join('');
     }
 
     // ===================== SETTINGS =====================
     function loadSettings() {
-      const settings = JSON.parse(localStorage.getItem('convertall-admin-settings') || '{}');
-      document.getElementById('defaultTheme').value = settings.theme || 'dark';
-      document.getElementById('defaultLang').value = settings.lang || 'fr';
-      document.getElementById('interstitialFreq').value = settings.interstitialFreq || '2';
+      const s = JSON.parse(localStorage.getItem('convertall-admin-settings') || '{}');
+      $('#defaultTheme').value = s.theme || 'dark';
+      $('#defaultLang').value = s.lang || 'fr';
+      $('#interstitialFreq').value = s.interstitialFreq || '2';
     }
-
-    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-      const settings = {
-        theme: document.getElementById('defaultTheme').value,
-        lang: document.getElementById('defaultLang').value,
-        interstitialFreq: document.getElementById('interstitialFreq').value,
-      };
-      localStorage.setItem('convertall-admin-settings', JSON.stringify(settings));
-      alert('Paramètres sauvegardés !');
+    $('#saveSettingsBtn').addEventListener('click', () => {
+      localStorage.setItem('convertall-admin-settings', JSON.stringify({
+        theme: $('#defaultTheme').value, lang: $('#defaultLang').value, interstitialFreq: $('#interstitialFreq').value,
+      }));
+      toast('Paramètres sauvegardés !', 'success');
     });
-
-    document.getElementById('changePassBtn').addEventListener('click', () => {
-      const newPass = document.getElementById('newPassword').value;
-      if (newPass.length < 4) { alert('Le mot de passe doit faire au moins 4 caractères'); return; }
-      localStorage.setItem('convertall-admin-pass', newPass);
-      document.getElementById('newPassword').value = '';
-      alert('Mot de passe changé !');
+    $('#changePassBtn').addEventListener('click', () => {
+      const p = $('#newPassword').value;
+      if (p.length < 4) { toast('Minimum 4 caractères', 'error'); return; }
+      localStorage.setItem('convertall-admin-pass', p);
+      $('#newPassword').value = '';
+      toast('Mot de passe changé !', 'success');
     });
-
-    // ===================== EXPORT =====================
-    document.getElementById('exportHistoryBtn').addEventListener('click', () => {
+    $('#exportHistoryBtn').addEventListener('click', () => {
       const h = getHistory();
       let csv = 'Date,Heure,Action,Fichiers,Entree,Sortie,Reduction\n';
       h.forEach(item => {
         const d = new Date(item.date);
-        const key = item.tool || item.type;
         const files = item.fileNames ? item.fileNames.join(' + ') : item.files;
         const reduction = item.inputSize > 0 && item.outputSize < item.inputSize ? Math.round((1 - item.outputSize / item.inputSize) * 100) + '%' : '—';
-        csv += `${d.toLocaleDateString()},${d.toLocaleTimeString()},${ACTION_LABELS[key] || key},"${files}",${item.inputSize},${item.outputSize},${reduction}\n`;
+        csv += `${d.toLocaleDateString()},${d.toLocaleTimeString()},${getActionLabel(item)},"${files}",${item.inputSize},${item.outputSize},${reduction}\n`;
       });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'convertall-history.csv'; a.click();
-      URL.revokeObjectURL(url);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'convertall-history.csv'; a.click();
+      toast('CSV exporté !', 'success');
     });
-
-    document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-      if (confirm('Vider tout l\'historique ? Cette action est irréversible.')) {
+    $('#clearHistoryBtn').addEventListener('click', () => {
+      if (confirm('Vider tout l\'historique ?')) {
         localStorage.removeItem('convertall-history');
-        loadDashboard();
+        initDashboard();
+        toast('Historique vidé', 'success');
       }
     });
   </script>
