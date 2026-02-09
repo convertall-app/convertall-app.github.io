@@ -217,12 +217,21 @@
 
     /* HISTORY */
     .history-section { margin-top:16px; }
-    .history-item { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg-drop); border:1px solid var(--border); border-radius:10px; margin-bottom:6px; font-size:.82rem; }
-    .history-item .hi-icon { font-size:1.1rem; }
-    .history-item .hi-info { flex:1; }
-    .history-item .hi-date { font-size:.72rem; color:var(--text-muted); }
-    .history-item .hi-detail { font-weight:600; }
-    .history-item .hi-sizes { color:var(--text-muted); font-size:.75rem; }
+    .history-item { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; background:var(--bg-drop); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; font-size:.82rem; transition:all .2s; }
+    .history-item:hover { border-color:var(--accent); background:rgba(102,126,234,0.05); }
+    .history-item .hi-icon { font-size:1.4rem; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(102,126,234,0.1); flex-shrink:0; }
+    .history-item .hi-info { flex:1; min-width:0; }
+    .history-item .hi-action { font-weight:700; font-size:.88rem; margin-bottom:3px; }
+    .history-item .hi-files { font-size:.76rem; color:var(--text-secondary); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .history-item .hi-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .history-item .hi-sizes { color:var(--text-muted); font-size:.74rem; }
+    .history-item .hi-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:.68rem; font-weight:600; }
+    .history-item .hi-badge.green { background:rgba(16,185,129,0.15); color:#10b981; }
+    .history-item .hi-badge.blue { background:rgba(102,126,234,0.15); color:#667eea; }
+    .history-item .hi-badge.orange { background:rgba(245,158,11,0.15); color:#f59e0b; }
+    .history-item .hi-right { text-align:right; flex-shrink:0; }
+    .history-item .hi-date { font-size:.7rem; color:var(--text-muted); }
+    .history-item .hi-time { font-size:.68rem; color:var(--text-muted); }
     .history-clear { margin-top:10px; }
 
     /* ABOUT */
@@ -1658,11 +1667,19 @@
 
     function addHistory(inputSize,outputSize,customType) {
       const h=getHistory();
+      const fileNames = selectedFiles.map(f => f.name);
+      const format = $('#outputFormat') ? $('#outputFormat').value : '';
       h.push({
         date:new Date().toISOString(),
-        type:customType||currentTab+'/'+currentSubTool,
-        files:selectedFiles.length,
+        tab: customType ? 'tools' : currentTab,
+        tool: customType || currentSubTool,
+        format: format,
+        fileNames: fileNames.slice(0, 5),
+        fileCount: selectedFiles.length || 1,
         inputSize, outputSize,
+        // Legacy compat
+        type: customType || currentTab+'/'+currentSubTool,
+        files: selectedFiles.length || 1,
       });
       saveHistory(h);
     }
@@ -1679,6 +1696,25 @@
       }
     }
 
+    const ACTION_LABELS = {
+      fr: {
+        convert:'Conversion image', resize:'Redimensionnement', compress:'Compression image', crop:'Recadrage', rotate:'Rotation',
+        favicon:'Génération favicon', qrcode:'QR Code', colorpicker:'Pipette couleur', base64:'Base64',
+        removebg:'Suppression fond', exif:'Suppression EXIF', txt2img:'Texte → Image', ascii:'ASCII Art',
+        'images-to-pdf':'Images → PDF', 'merge-pdf':'Fusion PDF', 'split-pdf':'Extraction pages PDF', 'compress-pdf':'Compression PDF',
+        media:'Conversion média', 'QR Code':'QR Code',
+      },
+      en: {
+        convert:'Image conversion', resize:'Resize', compress:'Image compression', crop:'Crop', rotate:'Rotation',
+        favicon:'Favicon generation', qrcode:'QR Code', colorpicker:'Color picker', base64:'Base64',
+        removebg:'Background removal', exif:'EXIF removal', txt2img:'Text → Image', ascii:'ASCII Art',
+        'images-to-pdf':'Images → PDF', 'merge-pdf':'Merge PDF', 'split-pdf':'Extract PDF pages', 'compress-pdf':'PDF compression',
+        media:'Media conversion', 'QR Code':'QR Code',
+      }
+    };
+
+    const TAB_ICONS = { images:'🖼️', documents:'📄', media:'🎬', tools:'🔧' };
+
     function renderHistory() {
       const list=$('#historyList'); list.innerHTML='';
       const h=getHistory().reverse();
@@ -1686,13 +1722,54 @@
       h.forEach(item=>{
         const d=new Date(item.date);
         const div=document.createElement('div'); div.className='history-item';
+
+        // Determine action label
+        const toolKey = item.tool || item.type.split('/')[1] || item.type;
+        const tabKey = item.tab || item.type.split('/')[0] || 'tools';
+        const labels = ACTION_LABELS[currentLang] || ACTION_LABELS.fr;
+        const actionName = labels[toolKey] || labels[item.format] || esc(item.type);
+        const icon = TAB_ICONS[tabKey] || '🔧';
+
+        // File names display
+        const names = item.fileNames || [];
+        const count = item.fileCount || item.files || 0;
+        let filesStr = '';
+        if (names.length > 0) {
+          filesStr = names.map(n => esc(n)).join(', ');
+          if (count > names.length) filesStr += ` (+${count - names.length})`;
+        } else {
+          filesStr = count + ' fichier(s)';
+        }
+
+        // Format badge
+        const fmt = item.format || '';
+        const fmtBadge = fmt ? `<span class="hi-badge blue">${esc(fmt.toUpperCase())}</span>` : '';
+
+        // Size reduction
+        let reductionBadge = '';
+        if (item.inputSize > 0 && item.outputSize > 0 && item.outputSize < item.inputSize) {
+          const pct = Math.round((1 - item.outputSize / item.inputSize) * 100);
+          reductionBadge = `<span class="hi-badge green">-${pct}%</span>`;
+        } else if (item.inputSize > 0 && item.outputSize > item.inputSize) {
+          const pct = Math.round((item.outputSize / item.inputSize - 1) * 100);
+          reductionBadge = `<span class="hi-badge orange">+${pct}%</span>`;
+        }
+
         div.innerHTML=`
-          <span class="hi-icon">${item.type.includes('image')?'🖼️':item.type.includes('doc')?'📄':item.type.includes('media')?'🎬':'🔧'}</span>
+          <div class="hi-icon">${icon}</div>
           <div class="hi-info">
-            <div class="hi-detail">${esc(item.type)} — ${item.files} fichier(s)</div>
-            <div class="hi-sizes">${fmtSize(item.inputSize)} → ${fmtSize(item.outputSize)}</div>
+            <div class="hi-action">${actionName}</div>
+            <div class="hi-files" title="${esc(filesStr)}">${filesStr}</div>
+            <div class="hi-meta">
+              <span class="hi-sizes">${fmtSize(item.inputSize)} → ${fmtSize(item.outputSize)}</span>
+              ${fmtBadge}
+              ${reductionBadge}
+            </div>
           </div>
-          <div class="hi-date">${d.toLocaleDateString()} ${d.toLocaleTimeString()}</div>
+          <div class="hi-right">
+            <div class="hi-date">${d.toLocaleDateString()}</div>
+            <div class="hi-time">${d.toLocaleTimeString()}</div>
+          </div>
         `;
         list.appendChild(div);
       });
